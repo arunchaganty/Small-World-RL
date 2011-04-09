@@ -1,0 +1,13 @@
+# Temporary Files
+*.swp
+*.swo
+*.pyc
+*.o
+*.txt
+
+# TeX
+*.log
+*.aux
+*.pdf
+*.dvi
+

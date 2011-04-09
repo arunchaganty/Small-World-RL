@@ -1,0 +1,54 @@
+\section{Introduction}
+\label{sec:intro}
+
+% Slow learning in RL
+In large domains, RL agents generally require a large number of samples to
+learn a good policy. The options framework proposed by Sutton, Precup and Singh
+provides extended actions for which a policy is already learnt, reducing the
+complexity of the learning task, and generally making the learning task faster.
+An open question in the options framework is discovering the options
+themselves.  There has been substantial work to learn options, mainly focussed
+around identifying ``bottleneck'' states, either empirically as in \cite{Stolle}, or
+more recently, using graph theoretic methods like betweeness \cite{Simsek} or
+graph partitions \cite{Simsek2005}.
+
+We would like to test an alternative hypothesis; we memorise many actions,
+not necessarily bottleneck ones, and put them together; based on their
+necessity in solving problems these actions are either reinforced, or gradually
+forgotten.  The actions could be of varying complexity, and it is intuitive to
+expect that we probably learn a great deal more {\em simple} actions than
+complex ones. In context of the options framework, the ``complex actions''
+correspond to options.
+
+Our proposed approach is to use randomly constructed options that create a
+'short-cut' between states, forming a sort of 'small-world' in the domain. This
+approach can be viewed as an extension of Kleinberg's popular model
+\cite{Kleinberg} in the Social Network Analysis field, and we would like to note
+that RL domains are very grid-like as well. The analogy is further motivated by
+observing that the policy followed by an agent in the MDP framework is like
+distributed search; we are interested in moving from our source state to the
+destination (goal) state using only information available locally, i.e. the
+value function. We leave addressing the dynamics of such random options, i.e.
+when options are added or removed, as future work.
+
+As part of our work, we would like to address the following interesting questions,
+\begin{enumerate}
+\item
+    What is the ``distance'' analogue in the RL domain? How can the dimension
+    be characterised?
+\item
+    How many such random edges need to be added in order to learn new problems
+    quickly? How does shaping the number of ``long short-cuts'' affect
+    performance? Can we use similar results as proposed in Kleinberg's original
+    work?
+\item
+    Can we apply this technique to create sub-goals in ``local'' state transition
+    graphs as in \cite{Simsek2005}?
+\end{enumerate}
+
+Finally, we in order to evaluate the performance of our approach, we will
+present the learning performance of agents trained on the Tic-Tac-Toe, Taxi and
+Playroom domains, using the intra-option and macro-Q learning algorithms. We
+will compare our performance with the agent without options, as well as an
+agent trained using the options learnt using betweeness measures. 
+

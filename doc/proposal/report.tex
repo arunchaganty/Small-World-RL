@@ -1,0 +1,63 @@
+\documentclass[a4paper,twocolumn]{article}
+\usepackage{fullpage}
+\usepackage{palatino}
+
+\usepackage{amsmath}   
+\usepackage{amsthm}     
+\usepackage[retainorgcmds]{IEEEtrantools}
+\usepackage{thumbpdf}
+\usepackage{multicol}   
+\usepackage{graphicx}   
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\usepackage[
+  pagebackref,
+  pdfpagelabels,
+  extension=pdf,
+]{hyperref}
+\hypersetup{ 
+  pdftitle          = {Exploring the Small-World Effect in Reinforcement Learning},
+  pdfsubject        = {Exploring the Small-World Effect in Reinforcement Learning},
+  pdfauthor         = {Arun Tejasvi Chaganty <arunchaganty@gmail.com>, Prateek Gaur <prtkgaur@gmail.com>},
+  pdfkeywords       = {},
+  pdfcreator        = {pdflatex},
+  pdfproducer       = {LaTeX with hyperref and thumbpdf},
+  pdfstartpage      = {1},
+  pdfpagemode       = UseThumbs,
+  colorlinks        = true,
+  linkcolor         = red,
+  anchorcolor       = red,
+  citecolor         = blue,
+  filecolor         = red,
+  urlcolor          = red
+}
+
+\newcommand{\ud}{\, \mathrm{d}}
+\newcommand{\diff}[1] {\frac{\partial}{\, \partial #1}}
+\newcommand{\diffn}[2] {\frac{\partial^{#2}}{\, \partial {#1}^{#2}}}
+
+\newcommand{\secref}[1] {\hyperref[#1]{Section~\ref*{#1}}}
+\newcommand{\algoref}[1] {\hyperref[#1]{Algorithm~\ref*{#1}}}
+\renewcommand{\algorithmiccomment}[1]{\textit{// #1}}
+
+\title{Exploring the Small-World Effect in Reinforcement Learning}
+\author{Arun Tejasvi Chaganty (CS07B023) \\ Prateek Gaur (CS07B030)}
+\begin{document}
+
+\maketitle
+%\pagebreak
+
+\input{intro}
+
+\bibliography{library}{}
+\bibliographystyle{alpha}
+
+%\newpage
+%\appendix
+
+%\include{code}
+
+\end{document}
+
