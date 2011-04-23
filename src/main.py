@@ -62,7 +62,7 @@ def load(agent_str, agent_args, env_str, env_args):
     except (ImportError, AssertionError):
         raise ArgumentError("Agent '%s' could not be found"%(agent_str))
     except (TypeError):
-        raise ArgumentError("Agent '%s' could not be initialised\n%s"%(agent_str,agent.__doc__))
+        raise ArgumentError("Agent '%s' could not be initialised\n%s"%(agent_str,agent.__init__.__doc__))
 
     try:
         mod = __import__("Environment.%s"%(env_str), fromlist=[Environment])
@@ -72,7 +72,7 @@ def load(agent_str, agent_args, env_str, env_args):
     except (ImportError, AssertionError):
         raise ArgumentError("Environment '%s' could not be found"%(env_str))
     except (TypeError):
-        raise ArgumentError("Environment '%s' could not be initialised\n%s"%(env_str,env.__doc__))
+        raise ArgumentError("Environment '%s' could not be initialised\n%s"%(env_str,env.__init__.__doc__))
 
     return agent, env
 
