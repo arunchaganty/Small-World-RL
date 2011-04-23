@@ -128,6 +128,7 @@ class Taxi(GraphEnvironment.GraphEnvironment):
     def generate_graph(self):
         """Construct a graph"""
         # State space vector: (locs x (starts + taxi) x starts)
+        starts = len(self.starts)
         road_size = self.road_map.shape[0]
         size = (road_size**2) * (starts+1) * (starts)
         graph = sparse.lil_matrix( (size, size) )
@@ -135,24 +136,26 @@ class Taxi(GraphEnvironment.GraphEnvironment):
         def get_state( dest, passenger, posx, posy ):
             st, offset = posy, road_size
             st, offset = st + offset * posx, offset * road_size
-            st, offset = st + offset * passenger, offset + offset * (starts + 1)
-            st, offset = st + offset * dest, offset + offset * starts
+            st, offset = st + offset * passenger, offset * (starts + 1)
+            st, offset = st + offset * dest, offset * starts
             assert(size == offset)
             return st
 
         # Road map matrix (Symmetrise?)
-        road_graph = sparse.lil_matrix( self.road_size )
+        road_graph = sparse.lil_matrix( (road_size*road_size, road_size*road_size) )
         for j in xrange( road_size ):
             for i in xrange( road_size ):
                 if i != 0:
-                    road_graph[ get_state(0,0,i,j), get_state(0,0,i-1,j)] = LEFT
+                    road_graph[ get_state(0,0,i,j), get_state(0,0,i-1,j)] = self.LEFT
                 if i != road_size-1:
-                    road_graph[ get_state(0,0,i,j), get_state(0,0,i+1,j)] = RIGHT
+                    road_graph[ get_state(0,0,i,j), get_state(0,0,i+1,j)] = self.RIGHT
                 if j != 0:
-                    road_graph[ get_state(0,0,i,j), get_state(0,0,i,j-1)] = UP
+                    road_graph[ get_state(0,0,i,j), get_state(0,0,i,j-1)] = self.UP
                 if j != road_size-1:
-                    road_graph[ get_state(0,0,i,j), get_state(0,0,i,j+1)] = DOWN
-        print road_graph.todense()
+                    road_graph[ get_state(0,0,i,j), get_state(0,0,i,j+1)] = self.DOWN
+        # Patch together to get graph
+        # When pos == passenger -> passenger = Taxi
+        # When pos == dest => stop.
 
-        return road_map
+        return graph
 
