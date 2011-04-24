@@ -157,5 +157,5 @@ class Taxi(GraphEnvironment.GraphEnvironment):
         # When pos == passenger -> passenger = Taxi
         # When pos == dest => stop.
 
-        return graph
+        return road_graph
 

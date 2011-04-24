@@ -12,7 +12,7 @@ class GraphEnvironment(Environment.Environment):
     def __init__(self):
         Environment.Environment.__init__(self)
         self.graph = self.generate_graph()
-        self.size = len( self.graph )
+        self.size = self.graph.shape[0]
         self.pos = None
 
         self.generate_graph()
@@ -28,7 +28,7 @@ class GraphEnvironment(Environment.Environment):
         # Choose a random node in the graph
         node = np.random.randint( self.size )
         self.pos = node
-        return node, graph[ node ] 
+        return node, self.graph[ node ] 
 
     def restart(self, reward):
         """Restarts the episode
@@ -36,7 +36,7 @@ class GraphEnvironment(Environment.Environment):
 
         node = np.random.randint( self.size )
         self.pos = node
-        return node, graph[ node ] 
+        return node, self.graph[ node ] 
 
     def react(self, action):
         """React to action
@@ -48,5 +48,23 @@ class GraphEnvironment(Environment.Environment):
 
         node = action
         self.pos = node
-        return node, graph[ node ] 
+        return node, self.graph[ node ] 
+    
+    def to_dot(self):
+        graph_size = self.graph.shape[0]
+
+        s = ""
+        # Print header
+        s += "graph {\n"
+        # For every vertex, print a node 
+        for i in xrange( graph_size ):
+            s += '%d [label=""];\n'%(i)
+        # For every edge
+        for i,j in zip( *self.graph.nonzero() ):
+            if i < j:
+                s += '%d -- %d [label=""];\n'%(i,j)
+
+        s += "}\n"
+
+        return s
 
