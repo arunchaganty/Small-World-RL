@@ -126,36 +126,62 @@ class Taxi(GraphEnvironment.GraphEnvironment):
         return road_map, starts
 
     def generate_graph(self):
-        """Construct a graph"""
-        # State space vector: (locs x (starts + taxi) x starts)
-        starts = len(self.starts)
+        """Construct a state-space graph
+        Graph created with nodes representing (passenger, destination, taxi_x, taxi_y);
+        There is only one state for passenger = destination.
+        """
+
+        # State space vector: (locs x dests x (starts - dest + taxi))
+        in_taxi = starts = len(self.starts)
         road_size = self.road_map.shape[0]
-        size = (road_size**2) * (starts+1) * (starts)
+        size = (road_size**2) * (starts) * (starts) + 1
         graph = sparse.lil_matrix( (size, size) )
 
-        def get_state( dest, passenger, posx, posy ):
+        # Get state index
+        def get_state( passenger, dest, posx, posy ):
             st, offset = posy, road_size
             st, offset = st + offset * posx, offset * road_size
-            st, offset = st + offset * passenger, offset * (starts + 1)
             st, offset = st + offset * dest, offset * starts
-            assert(size == offset)
+            # Some logic to handle the special definition of the passenger = destination state
+            if passenger > dest or passenger == in_taxi:
+                st, offset = st + offset * ( passenger - 1 ), offset * starts 
+            else:
+                st, offset = st + offset * passenger, offset * starts 
+            # The last state is reserved for passenger = destination
+            if passenger == dest: st = offset
+
+            assert( size == offset+1 )
+            assert( st < size + 1 )
+
             return st
 
         # Road map matrix (Symmetrise?)
-        road_graph = sparse.lil_matrix( (road_size*road_size, road_size*road_size) )
+        road_graph = sparse.lil_matrix( (road_size**2, road_size**2) )
         for j in xrange( road_size ):
             for i in xrange( road_size ):
                 if i != 0:
-                    road_graph[ get_state(0,0,i,j), get_state(0,0,i-1,j)] = self.LEFT
+                    road_graph[ road_size * (i) + (j), road_size * (i-1) + (j)] = self.LEFT
                 if i != road_size-1:
-                    road_graph[ get_state(0,0,i,j), get_state(0,0,i+1,j)] = self.RIGHT
+                    road_graph[ road_size * (i) + (j), road_size * (i+1) + (j)] = self.RIGHT
                 if j != 0:
-                    road_graph[ get_state(0,0,i,j), get_state(0,0,i,j-1)] = self.UP
+                    road_graph[ road_size * (i) + (j), road_size * (i) + (j-1)] = self.UP
                 if j != road_size-1:
-                    road_graph[ get_state(0,0,i,j), get_state(0,0,i,j+1)] = self.DOWN
-        # Patch together to get graph
-        # When pos == passenger -> passenger = Taxi
-        # When pos == dest => stop.
+                    road_graph[ road_size * (i) + (j), road_size * (i) + (j+1)] = self.DOWN
 
-        return road_graph
+        # Patch together to get graph
+        for dest in xrange(starts):
+            # When passenger \notin Taxi
+            for start in xrange(starts):
+                if start != dest:
+                    graph[ get_state(start,dest,0,0):get_state(start,dest,road_size-1,road_size-1)+1,
+                        get_state(start,dest,0,0):get_state(start,dest,road_size-1,road_size-1)+1] = road_graph 
+                    # When pos == start -> Taxi
+                    graph[ get_state(start,dest,*self.starts[start]), get_state(in_taxi,dest,*self.starts[start]) ] |= self.PICKUP
+            # When passenger \in Taxi
+            graph[ get_state(in_taxi,dest,0,0):get_state(in_taxi,dest,road_size-1,road_size-1)+1, 
+                get_state(in_taxi,dest,0,0):get_state(in_taxi,dest,road_size-1,road_size-1)+1] = road_graph 
+            # When pos == dest => stop.
+            graph[ get_state(in_taxi,dest,*self.starts[dest]), get_state(dest,dest,*self.starts[dest]) ] |= self.PUTDOWN
+
+        return graph
 
