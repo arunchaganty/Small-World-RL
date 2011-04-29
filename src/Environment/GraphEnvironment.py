@@ -15,13 +15,11 @@ class GraphEnvironment(Environment.Environment):
         self.size = self.graph.shape[0]
         self.pos = None
 
-        self.generate_graph()
-
     def generate_graph(self):
         """Generates the defining graph"""
         raise NotImplemented()
 
-    def start(self):
+    def _start(self):
         """Initialise the Environment
         @returns initial state and valid actions
         """
@@ -30,15 +28,7 @@ class GraphEnvironment(Environment.Environment):
         self.pos = node
         return node, self.graph[ node ] 
 
-    def restart(self, reward):
-        """Restarts the episode
-        @returns new state and valid actions, and reward"""
-
-        node = np.random.randint( self.size )
-        self.pos = node
-        return node, self.graph[ node ] 
-
-    def react(self, action):
+    def _react(self, action):
         """React to action
         @returns new state and valid actions, and reward, and if episode has
         ended

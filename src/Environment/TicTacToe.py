@@ -71,7 +71,7 @@ class TicTacToe(Environment.Environment):
     def __repr__(self):
         return "[TicTacToe %d]" % (id(self))
 
-    def start(self):
+    def _start(self):
         board, actions, reward, episode_ended = self.restart(0)
         return board, actions
 
@@ -96,7 +96,7 @@ class TicTacToe(Environment.Environment):
 
         return self.board, self.__get_actions(), reward, True
 
-    def react(self, action):
+    def _react(self, action):
         # Check action
         if action not in self.__get_actions():
             raise ValueError( "%s not a valid action"%(action,) )

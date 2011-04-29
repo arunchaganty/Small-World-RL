@@ -12,26 +12,27 @@ class Environment:
         """Initialise the Environment
         @returns initial state and valid actions
         """
-        raise NotImplemented()
+        return self._start()
 
-    def restart(self, reward):
-        """Restarts the episode
-        @returns new state and valid actions, and reward"""
+    def _start(self):
+        """Initialise the Environment
+        @returns initial state and valid actions
+        """
         raise NotImplemented()
 
     def react(self, action):
+        return self._react( action )
+
+    def _react(self, action):
         """React to action
         @returns new state and valid actions, and reward, and if episode has
         ended
         """
         raise NotImplemented()
 
-
     def optimal_actions(self, state, actions):
         """Return optimal action for state-action
         @returns optimal action(s)
         """
         raise NotImplemented()
-
-
 

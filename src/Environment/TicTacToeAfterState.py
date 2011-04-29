@@ -76,7 +76,7 @@ class TicTacToeAfterState(Environment.Environment):
     def __repr__(self):
         return "[TicTacToe %d]" % (id(self))
 
-    def start(self):
+    def _start(self):
         board, actions, reward, episode_ended = self.restart(0)
         return board, actions
 
@@ -103,7 +103,7 @@ class TicTacToeAfterState(Environment.Environment):
 
         return self.board, self.__get_actions(), reward, True
 
-    def react(self, action):
+    def _react(self, action):
         # Check action
         if not self.after_state:
             if action not in self.__get_actions():
