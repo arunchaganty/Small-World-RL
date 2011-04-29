@@ -6,20 +6,8 @@ import numpy as np
 import pdb
 import scipy
 import scipy.sparse as sparse
+import networkx as nx
 import GraphEnvironment
-import Agent
-
-# Load an agent
-def load(agent, agent_args):
-    """Load an agent"""
-    try:
-        mod = __import__("Agent.%s"%(agent), fromlist=[Agent])
-        assert( hasattr(mod, agent) )
-        agent = getattr(mod, agent)
-        agent = agent(*agent_args)
-    except (ImportError, AssertionError):
-        raise ArgumentError("Agent '%s' could not be found"%(agent))
-    return agent
 
 class Taxi(GraphEnvironment.GraphEnvironment):
     """
@@ -39,15 +27,17 @@ class Taxi(GraphEnvironment.GraphEnvironment):
     PICKUP  = 2**5
     PUTDOWN = 2**6
 
-    REWARD_SUCCESS = 100
-    REWARD_FAILURE = -1
     REWARD_BIAS = -1
+    REWARD_FAILURE = -1 - REWARD_BIAS
+    REWARD_SUCCESS = 100 - REWARD_BIAS
+    REWARD_CHECKPOINT = 10 - REWARD_BIAS
 
     # Environment Interface
     def __init__(self, spec, max_steps=300 ):
         """
         @spec - Specification (size, endpoints, barriers); either exactly
                 specified in a file, or with numeric values in a list
+        @max_steps - Number of steps that need to taken
         """
 
         # Check if the spec is a file
@@ -109,7 +99,7 @@ class Taxi(GraphEnvironment.GraphEnvironment):
         node = np.random.randint( (starts-1) * starts * (road_size**2) )
         self.pos = node
         self.steps = 0
-        return node, self.graph[ node, : ].nonzero()[1]
+        return node, self.graph.edges( [node] )
 
     def _react( self, action ):
         self.steps += 1
@@ -183,10 +173,22 @@ class Taxi(GraphEnvironment.GraphEnvironment):
             # When pos == dest => stop.
             graph[ get_state(in_taxi, dest, *self.starts[dest]), get_state(dest, dest, *self.starts[dest]) ] |= self.PUTDOWN
             # Set the reward states and end states
-            rewards[ 0, get_state(dest, dest, *self.starts[dest]) ] = self.REWARD_SUCCESS - self.REWARD_BIAS
-            end_states[ 0, get_state(dest, dest, *self.starts[dest]) ] = 1
 
-        return graph.tocsr(), rewards.tocsr(), self.REWARD_BIAS, end_states.tocsr()
+        pdb.set_trace()
+
+        # Use the above adj. matrix to create the below graph
+        graph = nx.DiGraph( graph, reward_bias = self.REWARD_BIAS )
+
+        # Set attributes
+        for dest in xrange(starts):
+            for start in xrange(starts):
+                if start != dest:
+                    graph.edge[ get_state(start, dest, *self.starts[start])][ 
+                            get_state(in_taxi, dest, *self.starts[start]) ]["reward"] = self.REWARD_CHECKPOINT
+            graph.node[ get_state(dest, dest, *self.starts[dest]) ]["reward"] = self.REWARD_SUCCESS
+            graph.node[ get_state(dest, dest, *self.starts[dest]) ]["end?"] = True
+
+        return graph
 
     def __load_file( self, spec_file ):
         """
@@ -236,3 +238,4 @@ class Taxi(GraphEnvironment.GraphEnvironment):
             for i in xrange(length):
                 road_map[ y0 + ((up^1)*i), x0 + up*i ] = 1
         return road_map, starts
+
