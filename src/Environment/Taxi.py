@@ -39,12 +39,12 @@ class Taxi(GraphEnvironment.GraphEnvironment):
     PICKUP  = 2**5
     PUTDOWN = 2**6
 
-    REWARD_SUCCESS = 10
+    REWARD_SUCCESS = 100
+    REWARD_FAILURE = -1
     REWARD_BIAS = -1
 
-
     # Environment Interface
-    def __init__(self, spec ):
+    def __init__(self, spec, max_steps=300 ):
         """
         @spec - Specification (size, endpoints, barriers); either exactly
                 specified in a file, or with numeric values in a list
@@ -52,7 +52,7 @@ class Taxi(GraphEnvironment.GraphEnvironment):
 
         # Check if the spec is a file
         if spec and spec.find(',') == -1: 
-            self.road_map, self.starts = self.load_file( spec )
+            self.road_map, self.starts = self.__load_file( spec )
         else:
             if not spec:
                 spec = DEFAULT_SPEC
@@ -60,7 +60,9 @@ class Taxi(GraphEnvironment.GraphEnvironment):
                 spec = map(int, spec.split(',') )
             if len( spec != 3 ):
                 raise ArgumentError("Incomplete specification")
-            self.road_map, self.starts = self.generate( *spec )
+            self.road_map, self.starts = self.__generate( *spec )
+
+        self.max_steps = max_steps
 
         GraphEnvironment.GraphEnvironment.__init__(self)
 
@@ -100,56 +102,24 @@ class Taxi(GraphEnvironment.GraphEnvironment):
     def __repr__(self):
         return "[Taxi %d]" % (id(self))
 
-    @staticmethod
-    def load_file( spec_file ):
-        """
-        Load a specification file:
-        <grid-size>
-        <start#> (<x>,<y>) (<x>,<y>) ...
-        <edge#> (<x>,<y>,<u>,<l>) (<x>,<y>,<u>,<l>) ...
-        """
+    def _start( self ):
+        starts = len(self.starts)
+        road_size = self.road_map.shape[0]
 
-        spec = map( str.strip, open( spec_file ).readlines() )
-        size = int( spec[0] )
-        road_map = np.zeros( (size,size) )
+        node = np.random.randint( (starts-1) * starts * (road_size**2) )
+        self.pos = node
+        self.steps = 0
+        return node, self.graph[ node, : ].nonzero()[1]
 
-        # HACK: Unsafe code here
-        starts = map(eval, spec[1].split())
-        edges = map(eval, spec[2].split())
-
-        for x0, y0, up, length in edges:
-            for i in xrange(length):
-                road_map[ y0 + ((up^1)*i), x0 + up*i ] = 1
-
-        for i in xrange(len(starts)):
-            tuple( reversed(starts[i]) )
-            road_map[ starts[i] ] = -(i+1)
-
-        return road_map, starts
-
-    @staticmethod
-    def generate( size, starts, edges ):
-        """
-        Generate a random map
-        @size - size of map
-        @starts - No. of starts
-        @edges - No. of edges
-        """
-
-        road_map = np.zeros( size, size )
-
-        starts = [ (np.random.randint(size), np.random.randint(size)) \
-                for i in starts ] 
-        # TODO: Something that makes sense here
-        edges = [ (np.random.randint(size), np.random.randint(size), 0, 2) 
-                    for i in edges ] 
-
-        for i in xrange(len(starts)):
-            road_map[ starts[i] ] = -i
-        for x0, y0, up, length in edges:
-            for i in xrange(length):
-                road_map[ y0 + ((up^1)*i), x0 + up*i ] = 1
-        return road_map, starts
+    def _react( self, action ):
+        self.steps += 1
+        if self.steps > self.max_steps:
+            node, actions = self._start()
+            reward = self.REWARD_FAILURE
+            episode_ended = True
+            return node, actions, reward, episode_ended
+        else:
+            return GraphEnvironment.GraphEnvironment._react( self, action )
 
     def generate_graph(self):
         """Construct a state-space graph
@@ -216,5 +186,53 @@ class Taxi(GraphEnvironment.GraphEnvironment):
             rewards[ 0, get_state(dest, dest, *self.starts[dest]) ] = self.REWARD_SUCCESS - self.REWARD_BIAS
             end_states[ 0, get_state(dest, dest, *self.starts[dest]) ] = 1
 
-        return graph, rewards, self.REWARD_BIAS, end_states
+        return graph.tocsr(), rewards.tocsr(), self.REWARD_BIAS, end_states.tocsr()
 
+    def __load_file( self, spec_file ):
+        """
+        Load a specification file:
+        <grid-size>
+        <start#> (<x>,<y>) (<x>,<y>) ...
+        <edge#> (<x>,<y>,<u>,<l>) (<x>,<y>,<u>,<l>) ...
+        """
+
+        spec = map( str.strip, open( spec_file ).readlines() )
+        size = int( spec[0] )
+        road_map = np.zeros( (size,size) )
+
+        # HACK: Unsafe code here
+        starts = map(eval, spec[1].split())
+        edges = map(eval, spec[2].split())
+
+        for x0, y0, up, length in edges:
+            for i in xrange(length):
+                road_map[ y0 + ((up^1)*i), x0 + up*i ] = 1
+
+        for i in xrange(len(starts)):
+            tuple( reversed(starts[i]) )
+            road_map[ starts[i] ] = -(i+1)
+
+        return road_map, starts
+
+    def __generate( self, size, starts, edges ):
+        """
+        Generate a random map
+        @size - size of map
+        @starts - No. of starts
+        @edges - No. of edges
+        """
+
+        road_map = np.zeros( size, size )
+
+        starts = [ (np.random.randint(size), np.random.randint(size)) \
+                for i in starts ] 
+        # TODO: Something that makes sense here
+        edges = [ (np.random.randint(size), np.random.randint(size), 0, 2) 
+                    for i in edges ] 
+
+        for i in xrange(len(starts)):
+            road_map[ starts[i] ] = -i
+        for x0, y0, up, length in edges:
+            for i in xrange(length):
+                road_map[ y0 + ((up^1)*i), x0 + up*i ] = 1
+        return road_map, starts
