@@ -3,9 +3,9 @@ Taxi Environment
 """
 
 import numpy as np
+import pdb
+import scipy
 import scipy.sparse as sparse
-import copy
-import Environment
 import GraphEnvironment
 import Agent
 
@@ -28,10 +28,10 @@ class Taxi(GraphEnvironment.GraphEnvironment):
     """
 
     # State represented by a 3-value 3x3 board (X, O, -)
-    DEFAULT_SPEC = (5,4,2)
+    DEFAULT_SPEC = (5, 4, 2)
     road_map = None
     starts = None
-
+    
     LEFT    = 2**1
     RIGHT   = 2**2
     UP      = 2**3
@@ -39,12 +39,17 @@ class Taxi(GraphEnvironment.GraphEnvironment):
     PICKUP  = 2**5
     PUTDOWN = 2**6
 
+    REWARD_SUCCESS = 10
+    REWARD_BIAS = -1
+
+
     # Environment Interface
-    def __init__(self, spec=None):
+    def __init__(self, spec ):
         """
         @spec - Specification (size, endpoints, barriers); either exactly
                 specified in a file, or with numeric values in a list
         """
+
         # Check if the spec is a file
         if spec and spec.find(',') == -1: 
             self.road_map, self.starts = self.load_file( spec )
@@ -60,16 +65,34 @@ class Taxi(GraphEnvironment.GraphEnvironment):
         GraphEnvironment.GraphEnvironment.__init__(self)
 
     def __str__(self):
+        road_size = self.road_map.shape[0]
+        starts = len(self.starts)
+        coords = self.pos % (road_size ** 2)
+        dest = (self.pos / (road_size ** 2)) % starts
+        pasn = (self.pos / (road_size ** 2 * starts)) % starts
+
+        dest_str = chr(ord('A') + dest)
+        if pasn < dest: 
+            pasn_str = chr(ord('A') + pasn)
+        elif pasn < starts - 1:
+            pasn_str = chr(ord('A') + pasn + 1)
+        elif pasn == starts - 1:
+            pasn_str = 'T'
+
         val = ""
-        val += "[Taxi]\n"
-        for row in self.road_map:
-            for col in row:
-                if col == 0:
+        val += "[Taxi P:%s D:%s]\n"%(pasn_str, dest_str)
+        for j in xrange( road_size ):
+            for i in xrange( road_size ):
+                tile = int( self.road_map[ j, i ] )
+                pos = j*road_size  + i
+                if pos == coords:
+                    val_ = "*"
+                elif tile == 0:
                     val_ = " "
-                if col == 1:
+                elif tile == 1:
                     val_ = "]"
-                if col < 0:
-                    val_ = "A" - col
+                elif tile < 0:
+                    val_ = chr(ord('A') - 1 - tile)
                 val += val_
             val += '\n'
         return val
@@ -94,12 +117,13 @@ class Taxi(GraphEnvironment.GraphEnvironment):
         starts = map(eval, spec[1].split())
         edges = map(eval, spec[2].split())
 
+        for x0, y0, up, length in edges:
+            for i in xrange(length):
+                road_map[ y0 + ((up^1)*i), x0 + up*i ] = 1
+
         for i in xrange(len(starts)):
             tuple( reversed(starts[i]) )
-            road_map[ starts[i] ] = -i
-        for x0,y0,d,l in edges:
-            for i in xrange(l):
-                road_map[ y0 + ((d^1)*i), x0 + d*i ] = 1
+            road_map[ starts[i] ] = -(i+1)
 
         return road_map, starts
 
@@ -114,15 +138,17 @@ class Taxi(GraphEnvironment.GraphEnvironment):
 
         road_map = np.zeros( size, size )
 
-        starts = [ (np.random.randint(size), np.random.randint(size)) for i in starts ] 
+        starts = [ (np.random.randint(size), np.random.randint(size)) \
+                for i in starts ] 
         # TODO: Something that makes sense here
-        edges = [ (np.random.randint(size), np.random.randint(size), 0, 2) for i in edges ] 
+        edges = [ (np.random.randint(size), np.random.randint(size), 0, 2) 
+                    for i in edges ] 
 
         for i in xrange(len(starts)):
             road_map[ starts[i] ] = -i
-        for x0,y0,d,l in edges:
-            for i in xrange(l):
-                road_map[ x0 + d*l, y0 + (d^1)*l ] = 1
+        for x0, y0, up, length in edges:
+            for i in xrange(length):
+                road_map[ y0 + ((up^1)*i), x0 + up*i ] = 1
         return road_map, starts
 
     def generate_graph(self):
@@ -136,19 +162,23 @@ class Taxi(GraphEnvironment.GraphEnvironment):
         road_size = self.road_map.shape[0]
         size = (road_size**2) * (starts) * (starts) + 1
         graph = sparse.lil_matrix( (size, size) )
+        rewards = sparse.lil_matrix( (1, size) )
+        end_states = sparse.lil_matrix( (1, size) )
 
         # Get state index
         def get_state( passenger, dest, posx, posy ):
-            st, offset = posy, road_size
-            st, offset = st + offset * posx, offset * road_size
+            st, offset = posx, road_size
+            st, offset = st + offset * posy, offset * road_size
             st, offset = st + offset * dest, offset * starts
-            # Some logic to handle the special definition of the passenger = destination state
+            # Some logic to handle the special definition of the passenger =
+            # destination state
             if passenger > dest or passenger == in_taxi:
                 st, offset = st + offset * ( passenger - 1 ), offset * starts 
             else:
                 st, offset = st + offset * passenger, offset * starts 
             # The last state is reserved for passenger = destination
-            if passenger == dest: st = offset
+            if passenger == dest: 
+                st = offset
 
             assert( size == offset+1 )
             assert( st < size + 1 )
@@ -159,29 +189,32 @@ class Taxi(GraphEnvironment.GraphEnvironment):
         road_graph = sparse.lil_matrix( (road_size**2, road_size**2) )
         for j in xrange( road_size ):
             for i in xrange( road_size ):
-                if i != 0:
-                    road_graph[ road_size * (i) + (j), road_size * (i-1) + (j)] = self.LEFT
-                if i != road_size-1:
-                    road_graph[ road_size * (i) + (j), road_size * (i+1) + (j)] = self.RIGHT
-                if j != 0:
-                    road_graph[ road_size * (i) + (j), road_size * (i) + (j-1)] = self.UP
-                if j != road_size-1:
-                    road_graph[ road_size * (i) + (j), road_size * (i) + (j+1)] = self.DOWN
+                if i > 0 and self.road_map[j,i-1] <> 1:
+                    road_graph[ road_size * (j) + (i), road_size * (j) + (i-1)] = self.LEFT
+                if i < road_size-1 and self.road_map[j,i] <> 1: 
+                    road_graph[ road_size * (j) + (i), road_size * (j) + (i+1)] = self.RIGHT
+                if j > 0:
+                    road_graph[ road_size * (j) + (i), road_size * (j-1) + (i)] = self.UP
+                if j < road_size-1: 
+                    road_graph[ road_size * (j) + (i), road_size * (j+1) + (i)] = self.DOWN
 
         # Patch together to get graph
         for dest in xrange(starts):
             # When passenger \notin Taxi
             for start in xrange(starts):
                 if start != dest:
-                    graph[ get_state(start,dest,0,0):get_state(start,dest,road_size-1,road_size-1)+1,
-                        get_state(start,dest,0,0):get_state(start,dest,road_size-1,road_size-1)+1] = road_graph 
+                    graph[ get_state(start, dest, 0, 0):get_state(start, dest, road_size-1, road_size-1)+1,
+                        get_state(start, dest, 0, 0):get_state(start, dest, road_size-1, road_size-1)+1] = road_graph 
                     # When pos == start -> Taxi
-                    graph[ get_state(start,dest,*self.starts[start]), get_state(in_taxi,dest,*self.starts[start]) ] |= self.PICKUP
+                    graph[ get_state(start, dest, *self.starts[start]), get_state(in_taxi, dest, *self.starts[start]) ] |= self.PICKUP
             # When passenger \in Taxi
-            graph[ get_state(in_taxi,dest,0,0):get_state(in_taxi,dest,road_size-1,road_size-1)+1, 
-                get_state(in_taxi,dest,0,0):get_state(in_taxi,dest,road_size-1,road_size-1)+1] = road_graph 
+            graph[ get_state(in_taxi, dest, 0, 0):get_state(in_taxi, dest, road_size-1, road_size-1)+1, 
+                get_state(in_taxi, dest, 0, 0):get_state(in_taxi, dest, road_size-1, road_size-1)+1] = road_graph 
             # When pos == dest => stop.
-            graph[ get_state(in_taxi,dest,*self.starts[dest]), get_state(dest,dest,*self.starts[dest]) ] |= self.PUTDOWN
+            graph[ get_state(in_taxi, dest, *self.starts[dest]), get_state(dest, dest, *self.starts[dest]) ] |= self.PUTDOWN
+            # Set the reward states and end states
+            rewards[ 0, get_state(dest, dest, *self.starts[dest]) ] = self.REWARD_SUCCESS - self.REWARD_BIAS
+            end_states[ 0, get_state(dest, dest, *self.starts[dest]) ] = 1
 
-        return graph
+        return graph, rewards, self.REWARD_BIAS, end_states
 

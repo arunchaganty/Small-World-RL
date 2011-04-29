@@ -11,7 +11,7 @@ class GraphEnvironment(Environment.Environment):
 
     def __init__(self):
         Environment.Environment.__init__(self)
-        self.graph = self.generate_graph()
+        self.graph, self.rewards, self.reward_bias, self.end_states = self.generate_graph()
         self.size = self.graph.shape[0]
         self.pos = None
 
@@ -26,7 +26,7 @@ class GraphEnvironment(Environment.Environment):
         # Choose a random node in the graph
         node = np.random.randint( self.size )
         self.pos = node
-        return node, self.graph[ node ] 
+        return node, self.graph[ node, : ].nonzero()[1]
 
     def _react(self, action):
         """React to action
@@ -38,7 +38,14 @@ class GraphEnvironment(Environment.Environment):
 
         node = action
         self.pos = node
-        return node, self.graph[ node ] 
+        actions = self.graph[ node, : ].nonzero()[1]
+        reward = self.rewards[ 0, node ] + self.reward_bias
+        episode_ended = bool( self.end_states[ 0, node ]  )
+
+        if episode_ended:
+            node, actions = self._start()
+            
+        return node, actions, reward, episode_ended
     
     def to_dot(self):
         graph_size = self.graph.shape[0]
@@ -53,7 +60,6 @@ class GraphEnvironment(Environment.Environment):
         for i,j in zip( *self.graph.nonzero() ):
             if i < j:
                 s += '%d -- %d [label=""];\n'%(i,j)
-
         s += "}\n"
 
         return s
