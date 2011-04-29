@@ -9,6 +9,9 @@ def state_(state):
     """Create a hashable by converting to a tuple"""
     return tuple( [ tuple( row ) for row in state ] )
 
+def choose( lst ):
+    return lst[random.randint(len(lst))]
+
 class ValueAgent(Agent.Agent):
     """
     Generic Value-based agent
@@ -30,7 +33,6 @@ class ValueAgent(Agent.Agent):
 
     def act(self, state, actions, reward, episode_ended):
         # epsilon-greedy
-        state = state_(state)
         if not self.Q.has_key(state):
             self.Q[state] = {}
         for action in actions:
@@ -39,10 +41,11 @@ class ValueAgent(Agent.Agent):
 
         # Explore
         if random.random() < self.e:
-            action = actions[random.randint(len(actions))]
+            action = choose( actions )
         # Exploit
         else:
-            action = max(actions, key = lambda x: self.Q[state][x])
+            max_value = max(self.Q[state].values())
+            action = choose( [ a for a in actions if self.Q[state][a] == max_value ] )
 
         # Update actions
         if episode_ended:

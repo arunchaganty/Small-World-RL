@@ -51,18 +51,6 @@ class GibbsDistribution(RandomDistribution):
         # print "Initialising - ", pdf
         self.s = "Gibbs"
 
-
-def state_(state):
-    """Create a hashable by converting to a tuple"""
-    return tuple( [ tuple( row ) for row in state ] )
-
-def count_moves(board):
-    """Count the number of moves that have been played on the board
-    @returns movedFirst?, moveNumber
-    """
-    count = abs(board).sum()
-    return count/2
-
 class PolicyGradient(Agent.Agent):
     r"""
     Implements a policy-gradient agent
@@ -117,11 +105,6 @@ class PolicyGradient(Agent.Agent):
         for action in actions:
             self.theta[hashed_state][action] = 0
 
-    def detect_episode_boundary(self, state):
-        count = self.move_count
-        self.move_count = count_moves(state)
-        return count > self.move_count
-
     def update_theta(self, reward):
         """Updates the action preferences (theta_i)"""
 
@@ -141,7 +124,7 @@ class PolicyGradient(Agent.Agent):
 
     def act(self, state, actions, reward, episode_ended):
         # Hash the state
-        hashed_state = state_(state)
+        hashed_state = state 
         # Detect if the episode has finished
         if episode_ended and len(self.trajectory) > 0:
             self.update_theta(reward)
