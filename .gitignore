@@ -11,3 +11,8 @@
 *.pdf
 *.dvi
 
+# Data
+*.dot
+*.png
+*.mat
+*.dat
