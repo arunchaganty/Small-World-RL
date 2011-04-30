@@ -26,6 +26,8 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
             self.set_options( [] )
         elif option_scheme == "optimal":
             self.set_options( self.__get_optimal_options() )
+        elif option_scheme == "random":
+            self.set_options( self.__get_random_options() )
         else:
             raise NotImplemented() 
 
@@ -67,6 +69,43 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
             st = self.get_state( in_taxi, dest_i, *self.starts[ dest_i ] )
             paths = nx.shortest_path( grs, source=st )
             options.append( self.__make_option_from_paths( st, paths ) )
+
+        return options
+
+    def __make_option_from_path( self, start, stop, path ):
+        start = set( [start] )
+        stop = set( [stop] )
+        policy = dict( zip( path[:-1], path[1:] ) )
+
+        option = OptionEnvironment.DeterministicOption( start, stop, policy )
+
+        return option
+
+
+    def __get_random_options( self, r = 2 ):
+        # Get all the edges in the graph
+        path_lengths = nx.shortest_path_length( self.graph )
+        paths = nx.shortest_path( self.graph )
+
+        options = []
+
+        for node, node_dists in path_lengths.items():
+            node_dists.pop( node )
+            if not node_dists: 
+                continue
+            neighbours, dists = zip( *node_dists.items() )
+            # Create a pr distribution
+            dists = np.power( np.array( dists, dtype=float ), -r )
+            # Zero out neighbours
+            for i in xrange( len( dists ) ):
+                if dists[i] == 1: dists[i] = 0
+            if not dists.any(): 
+                continue
+            dists = dists / sum(dists)
+            idx = np.random.multinomial(1, dists).argmax()
+
+            dest = neighbours[ idx ]
+            options.append( self.__make_option_from_path( node, dest, paths[node][dest] ) )
 
         return options
 

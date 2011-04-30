@@ -93,10 +93,11 @@ class OptionEnvironment(Environment.Environment):
             # Get the action from the option
             action = option.execute( state, actions )
             state, actions, reward, episode_ended = self._react( action )
+            self.__last_state_action = state, actions
 
             # Quit if the episode has ended
             if episode_ended:
-                return state, actions + self.get_options( state ), reward, episode_ended 
+                return [(state,actions)], actions + self.get_options( state ), [reward], episode_ended 
                 
             history.append( (state, actions) )
             rewards.append( reward )
@@ -112,7 +113,7 @@ class OptionEnvironment(Environment.Environment):
                 if episode_ended: 
                     break
 
-            self.__last_state_action = state, action
+            self.__last_state_action = state, actions
             return history, actions + self.get_options( state ), rewards, episode_ended 
                 
         else:
