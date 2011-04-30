@@ -1,0 +1,47 @@
+#!/usr/bin/env python2
+# vim:ft=python
+
+# Average over files specified in argument
+# Assumes first 'n' (default=1) columns are keys
+
+import operator
+import sys
+
+def tuple_add(t1, t2):
+    return tuple(map(lambda x: reduce(operator.add, x), zip(t1,t2)))
+
+def read_from_file(filename):
+    if filename == "-":
+        f = sys.stdin
+    else:
+        f = open( filename )
+
+    for line in f.readlines():
+        values = tuple(map(float, line.split()))
+        yield values
+
+    f.close()
+
+def time_average(seq, window):
+    seq = list(seq)
+    assert( len(seq) > window )
+    for i in xrange(window, len(seq) - window):
+        #yield reduce( tuple_add, seq[i:i+window] )
+        yield map( lambda v: v*1/float(window), reduce( tuple_add, seq[i:i+window] ) )
+
+def main(*args):
+    if len(args) == 2:
+        filename = str(args[0])
+        window = int(args[1])
+    else:
+        print "Usage %s <file> <window>"%(sys.argv[0])
+        sys.exit(1)
+
+    values = read_from_file(filename)
+    values = time_average(values, window)
+    for v in values:
+        print ' '.join(map(str,v))
+
+if __name__ == "__main__":
+    import sys
+    main(*sys.argv[1:])
