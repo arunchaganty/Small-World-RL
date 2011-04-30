@@ -31,7 +31,9 @@ def post_react_hook(env, agent, state, actions, reward, episode_ended):
     global __time__
     if episode_ended:
         print __time__, reward
-    __time__ += 1
+        __time__ = 0
+    else:
+        __time__ += 1
 
 def main(epochs, agent_str, agent_args, env_str, env_args, verbose):
     """RL Testbed.

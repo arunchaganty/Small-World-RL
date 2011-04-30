@@ -3,6 +3,7 @@ Environment that supports Options
 """
 
 import Environment
+import pdb
 
 class Option:
     """Encapsulates an option: start, stop and policy predicates"""
@@ -24,6 +25,34 @@ class Option:
     def execute(self, state, actions ):
         """Choose an option as per the policy"""
         return self.policy( state, actions )
+
+class MapOption( Option ):
+    def can_start(self, state):
+        """Check if the option can be be started in this state"""
+        return bool( self.start[ state ] )
+
+    def should_stop(self, state):
+        """Check if the option should be stopped"""
+        return bool( np.random.binomial(1, self.stop[ state ] ) )
+
+    def execute(self, state, actions ):
+        """Choose an option as per the policy"""
+        return np.random.multinomial(1, self.policy[ state, : ] ).argmax()
+
+class DeterministicOption( Option ):
+    def can_start(self, state):
+        """Check if the option can be be started in this state"""
+        return state in self.start
+
+    def should_stop(self, state):
+        """Check if the option should be stopped"""
+        return state in self.stop
+
+    def execute(self, state, actions ):
+        """Choose an option as per the policy"""
+        action = self.policy[ state ]
+        assert( action in actions )
+        return action
 
 class OptionEnvironment(Environment.Environment):
     """Environment that defines a graph structure"""
@@ -62,7 +91,7 @@ class OptionEnvironment(Environment.Environment):
             state, actions = self.__last_state_action
 
             # Get the action from the option
-            action = option.policy( state, actions )
+            action = option.execute( state, actions )
             state, actions, reward, episode_ended = self._react( action )
 
             # Quit if the episode has ended
@@ -74,7 +103,7 @@ class OptionEnvironment(Environment.Environment):
 
             while not option.should_stop( state ):
                 # Get the action from the option
-                action = option.policy( state, actions )
+                action = option.execute( state, actions )
                 state, actions, reward, episode_ended = self._react( action )
                 history.append( (state, actions) )
                 rewards.append( reward )
@@ -88,5 +117,6 @@ class OptionEnvironment(Environment.Environment):
                 
         else:
             state, actions, reward, episode_ended = self._react( action )
+            self.__last_state_action = state, actions
             return state, actions + self.get_options( state ), reward, episode_ended
 

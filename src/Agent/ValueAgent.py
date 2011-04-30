@@ -2,12 +2,16 @@
 Generic Value Based agent
 """
 
+import pdb
 import Agent
+from Environment.OptionEnvironment import Option
+import collections
 from numpy import random
 
 def state_(state):
     """Create a hashable by converting to a tuple"""
-    return tuple( [ tuple( row ) for row in state ] )
+    return state
+    #return tuple( [ tuple( row ) for row in state ] )
 
 def choose( lst ):
     return lst[random.randint(len(lst))]
@@ -32,7 +36,11 @@ class ValueAgent(Agent.Agent):
         raise NotImplemented()
 
     def act(self, state, actions, reward, episode_ended):
+        # Hack to just take the first state with options
+        if isinstance( self.old_action, Option ):
+            state, reward, = state[-1][0], sum( reward )
         # epsilon-greedy
+        state = state_(state)
         if not self.Q.has_key(state):
             self.Q[state] = {}
         for action in actions:

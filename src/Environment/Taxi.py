@@ -3,7 +3,6 @@ Taxi Environment
 """
 
 import numpy as np
-import pdb
 import scipy
 import scipy.sparse as sparse
 import networkx as nx
@@ -33,7 +32,7 @@ class Taxi(GraphEnvironment.GraphEnvironment):
     REWARD_CHECKPOINT = 10 - REWARD_BIAS
 
     # Environment Interface
-    def __init__(self, spec, max_steps=300 ):
+    def __init__(self, spec, max_steps=500 ):
         """
         @spec - Specification (size, endpoints, barriers); either exactly
                 specified in a file, or with numeric values in a list
@@ -92,6 +91,35 @@ class Taxi(GraphEnvironment.GraphEnvironment):
     def __repr__(self):
         return "[Taxi %d]" % (id(self))
 
+    # Get state index
+    def get_state(self, passenger, dest, posx, posy ):
+        in_taxi = starts = len(self.starts)
+        road_size = self.road_map.shape[0]
+
+        st, offset = posx, road_size
+        st, offset = st + offset * posy, offset * road_size
+        st, offset = st + offset * dest, offset * starts
+        # Some logic to handle the special definition of the passenger =
+        # destination state
+        if passenger > dest or passenger == in_taxi:
+            st, offset = st + offset * ( passenger - 1 ), offset * starts 
+        else:
+            st, offset = st + offset * passenger, offset * starts 
+        # The last state is reserved for passenger = destination
+        if passenger == dest: 
+            st = offset
+        return st
+
+    def unget_state(self, state):
+        in_taxi = starts = len(self.starts)
+        road_size = self.road_map.shape[0]
+
+        posx, state = state % road_size, state / road_size 
+        posy, state = state % road_size, state / road_size 
+        dest, state = state % starts, state / starts 
+        pasn, state = state % starts, state / starts 
+        return pasn, dest, posx, posy
+
     def _start( self ):
         starts = len(self.starts)
         road_size = self.road_map.shape[0]
@@ -99,7 +127,7 @@ class Taxi(GraphEnvironment.GraphEnvironment):
         node = np.random.randint( (starts-1) * starts * (road_size**2) )
         self.pos = node
         self.steps = 0
-        return node, self.graph.edges( [node] )
+        return node, [ j for i,j in self.graph.edges( [node] ) ]
 
     def _react( self, action ):
         self.steps += 1
@@ -122,28 +150,7 @@ class Taxi(GraphEnvironment.GraphEnvironment):
         road_size = self.road_map.shape[0]
         size = (road_size**2) * (starts) * (starts) + 1
         graph = sparse.lil_matrix( (size, size) )
-        rewards = sparse.lil_matrix( (1, size) )
-        end_states = sparse.lil_matrix( (1, size) )
-
-        # Get state index
-        def get_state( passenger, dest, posx, posy ):
-            st, offset = posx, road_size
-            st, offset = st + offset * posy, offset * road_size
-            st, offset = st + offset * dest, offset * starts
-            # Some logic to handle the special definition of the passenger =
-            # destination state
-            if passenger > dest or passenger == in_taxi:
-                st, offset = st + offset * ( passenger - 1 ), offset * starts 
-            else:
-                st, offset = st + offset * passenger, offset * starts 
-            # The last state is reserved for passenger = destination
-            if passenger == dest: 
-                st = offset
-
-            assert( size == offset+1 )
-            assert( st < size + 1 )
-
-            return st
+        get_state = self.get_state
 
         # Road map matrix (Symmetrise?)
         road_graph = sparse.lil_matrix( (road_size**2, road_size**2) )
@@ -173,8 +180,6 @@ class Taxi(GraphEnvironment.GraphEnvironment):
             # When pos == dest => stop.
             graph[ get_state(in_taxi, dest, *self.starts[dest]), get_state(dest, dest, *self.starts[dest]) ] |= self.PUTDOWN
             # Set the reward states and end states
-
-        pdb.set_trace()
 
         # Use the above adj. matrix to create the below graph
         graph = nx.DiGraph( graph, reward_bias = self.REWARD_BIAS )

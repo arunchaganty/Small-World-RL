@@ -29,14 +29,13 @@ class GraphEnvironment(Environment.Environment):
         # Choose a random node in the graph
         node = np.random.randint( len( self.graph ) )
         self.pos = node
-        return node, self.graph.edges( [node] )
+        return node, [ j for i,j in self.graph.edges( [node] ) ]
 
     def _react(self, action):
         """React to action
         @returns new state and valid actions, and reward, and if episode has
         ended
         """
-        action = action[1]
         if not self.graph.has_edge( self.pos, action ):
             raise ValueError( "%s -> %s not a valid action"%(self.pos,action,) )
 
@@ -44,7 +43,7 @@ class GraphEnvironment(Environment.Environment):
         reward = self.graph.edge[self.pos][action].get( "reward", 0 )
 
         self.pos = node = action
-        actions = self.graph.edges( [node] )
+        actions = [ j for i,j in self.graph.edges( [node] ) ]
         reward += self.graph.node[node].get( "reward", 0 )
         episode_ended = self.graph.node[node].get( "end?", False )
 
