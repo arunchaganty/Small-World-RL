@@ -30,7 +30,7 @@ def post_react_hook(env, agent, state, actions, reward, episode_ended):
     """Do something after the environment handles an action"""
     global __time__
     if episode_ended:
-        print __time__, reward
+        #print __time__, reward
         __time__ = 0
     else:
         __time__ += 1
