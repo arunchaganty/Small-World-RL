@@ -24,8 +24,12 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
         # Add options for all the optimal states
         if option_scheme == "none":
             self.set_options( [] )
+        elif option_scheme == "human":
+            self.set_options( self.__get_human_options() )
         elif option_scheme == "optimal":
             self.set_options( self.__get_optimal_options() )
+        elif option_scheme == "small-world":
+            self.set_options( self.__get_small_world_options() )
         elif option_scheme == "random":
             self.set_options( self.__get_random_options() )
         else:
@@ -62,13 +66,44 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
                 st = self.get_state( start_i, dest_i, *self.starts[ start_i ] )
                 paths = nx.shortest_path( gr, source=st )
                 options.append( self.__make_option_from_paths( st, paths ) )
-            # Paths to the the destination
+            # Paths to the destination
             grs = gr.subgraph( range( 
                 self.get_state( in_taxi, dest_i, 0, 0 ),
                 self.get_state( in_taxi, dest_i, road_size, road_size-1 ) ) )
             st = self.get_state( in_taxi, dest_i, *self.starts[ dest_i ] )
             paths = nx.shortest_path( grs, source=st )
             options.append( self.__make_option_from_paths( st, paths ) )
+
+        return options
+
+    def __get_human_options( self ):
+        """Use human-defined options"""
+        # Reverse the graph to get the shortest paths to state
+        gr = self.graph.reverse()
+        options = []
+        
+        in_taxi = len( self.starts )
+        road_size = len( self.road_map )
+        for dest_i in xrange( len( self.starts ) ):
+            # Paths to the passenger
+            for start_i in xrange( len( self.starts ) ):
+                if start_i == dest_i: 
+                    continue
+                for start_j in xrange( len( self.starts ) ):
+                    if start_j == dest_i: 
+                        continue
+                    # Paths to some pad
+                    st = self.get_state( start_i, dest_i, *self.starts[ start_j ] )
+                    paths = nx.shortest_path( gr, source=st )
+                    options.append( self.__make_option_from_paths( st, paths ) )
+            # Paths to the destination
+            grs = gr.subgraph( range( 
+                self.get_state( in_taxi, dest_i, 0, 0 ),
+                self.get_state( in_taxi, dest_i, road_size, road_size-1 ) ) )
+            for dest_j in xrange( len( self.starts ) ):
+                st = self.get_state( in_taxi, dest_i, *self.starts[ dest_j ] )
+                paths = nx.shortest_path( grs, source=st )
+                options.append( self.__make_option_from_paths( st, paths ) )
 
         return options
 
@@ -81,8 +116,7 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
 
         return option
 
-
-    def __get_random_options( self, r = 2 ):
+    def __get_small_world_options( self, r = 2 ):
         # Get all the edges in the graph
         path_lengths = nx.shortest_path_length( self.graph )
         paths = nx.shortest_path( self.graph )
@@ -106,6 +140,28 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
 
             dest = neighbours[ idx ]
             options.append( self.__make_option_from_path( node, dest, paths[node][dest] ) )
+
+        return options
+
+    def __get_random_options( self ):
+        # Get all the edges in the graph
+        paths = nx.shortest_path( self.graph )
+
+        options = []
+
+        for node, node_paths in paths.items():
+            neighbours, node_paths = zip( *node_paths.items() )
+            dist = np.ones( len( node_paths ) )
+            # Zero out neighbours
+            for i in xrange( len( dist ) ):
+                if len( node_paths[i] ) < 2:
+                    dist[i] = 0
+            if not dist.any(): 
+                continue
+            dist = dist / sum(dist)
+            idx = np.random.multinomial(1, dist).argmax()
+
+            options.append( self.__make_option_from_path( node, neighbours[idx], node_paths[idx] ) )
 
         return options
 
