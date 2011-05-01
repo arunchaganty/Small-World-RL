@@ -29,7 +29,8 @@ class MacroQ(OptionValueAgent.OptionValueAgent):
         q = self.Q[state][action]
         # Check if the state is a list for actions
         if isinstance( action, Option ):
-            state_ = state_[-1][0]
+            if state_:
+                state_ = state_[-1][0]
             k = len(reward)
             reward = sum( [ self.gamma**i * reward[i] for i in xrange(k) ] )
         else:
