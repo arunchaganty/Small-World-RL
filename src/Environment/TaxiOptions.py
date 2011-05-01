@@ -24,8 +24,8 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
         # Add options for all the optimal states
         if option_scheme == "none":
             self.set_options( [] )
-        elif option_scheme == "human":
-            self.set_options( self.__get_human_options() )
+        elif option_scheme == "manual":
+            self.set_options( self.__get_manual_options() )
         elif option_scheme == "optimal":
             self.set_options( self.__get_optimal_options() )
         elif option_scheme == "small-world":
@@ -78,8 +78,8 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
 
         return options
 
-    def __get_human_options( self ):
-        """Use human-defined options"""
+    def __get_manual_options( self ):
+        """Use manually-defined options"""
         # Reverse the graph to get the shortest paths to state
         gr = self.graph.reverse()
         options = []
