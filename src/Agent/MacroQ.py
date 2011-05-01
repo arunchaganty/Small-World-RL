@@ -32,7 +32,7 @@ class MacroQ(OptionValueAgent.OptionValueAgent):
             if state_:
                 state_ = state_[-1][0]
             k = len(reward)
-            reward = sum( [ self.gamma**i * reward[i] for i in xrange(k) ] )
+            reward = sum( ( self.gamma**i * reward[i] for i in xrange(k) ) )
         else:
             k = 1
 

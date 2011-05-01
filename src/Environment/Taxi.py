@@ -136,7 +136,7 @@ class Taxi(GraphEnvironment.GraphEnvironment):
         self.best_steps = self.__get_min_step_count( state )
         self.steps = 0
 
-        return state, [ j for i,j in self.graph.edges( [state] ) ]
+        return state, tuple( ( j for i,j in self.graph.edges( (state) ) ) )
 
     def _react( self, action ):
         self.steps += 1

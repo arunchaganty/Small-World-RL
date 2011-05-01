@@ -49,8 +49,8 @@ class ValueAgent(Agent.Agent):
             action = choose( actions )
         # Exploit
         else:
-            max_value = max(self.Q[state].values())
-            action = choose( [ a for a in actions if self.Q[state][a] == max_value ] )
+            max_value = max( self.Q[state].values() )
+            action = choose( tuple( a for a in actions if self.Q[state][a] == max_value ) )
 
         # Update actions
         if episode_ended:

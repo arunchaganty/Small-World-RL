@@ -13,6 +13,9 @@ class Option:
         self.start = start
         self.stop = stop
         self.policy = policy
+
+    def __repr__(self):
+        return "[Option: %s]"%( id( self ) )
     
     def can_start(self, state):
         """Check if the option can be be started in this state"""
@@ -64,12 +67,17 @@ class OptionEnvironment(Environment.Environment):
 
     def set_options( self, options ):
         """Set the options to be used by the environment"""
-        self.options = options
+        self.options = tuple(options)
+        self.option_store = {}
+
 
     def get_options( self, state ):
         """Get all relevant options for the state"""
-        return [ option for option in self.options if 
-                option.can_start( state ) ]
+        # Memoise - saves naming pains
+        if not self.option_store.has_key( state ):
+            self.option_store[ state ] = tuple( ( option for option in self.options if 
+                option.can_start( state ) ) )
+        return self.option_store[ state ]
 
     def start(self):
         """Initialise the Environment
@@ -89,35 +97,44 @@ class OptionEnvironment(Environment.Environment):
             history = []
             rewards = []
             state, actions = self.__last_state_action
+            actions_ = actions + self.get_options( state )
 
             # Get the action from the option
             action = option.execute( state, actions )
+            history.append( (state, action, actions_) )
+
             state, actions, reward, episode_ended = self._react( action )
+            rewards.append( reward )
+
             self.__last_state_action = state, actions
+            actions_ = actions + self.get_options( state )
 
             # Quit if the episode has ended
             if episode_ended:
-                return [(state,actions)], actions + self.get_options( state ), [reward], episode_ended 
+                history.append( (state, None, actions_) )
+                return history, actions_, (reward,), episode_ended 
                 
-            history.append( (state, actions) )
-            rewards.append( reward )
-
             while not option.should_stop( state ):
                 # Get the action from the option
                 action = option.execute( state, actions )
+                history.append( (state, action, actions_ ) )
+
                 state, actions, reward, episode_ended = self._react( action )
-                history.append( (state, actions) )
                 rewards.append( reward )
 
+                actions_ = actions + self.get_options( state )
                 # Quit if the episode has ended
                 if episode_ended: 
                     break
 
             self.__last_state_action = state, actions
-            return history, actions + self.get_options( state ), rewards, episode_ended 
+            history.append( (state, None, actions_) )
+
+            return history, actions_, rewards, episode_ended 
                 
         else:
             state, actions, reward, episode_ended = self._react( action )
             self.__last_state_action = state, actions
-            return state, actions + self.get_options( state ), reward, episode_ended
+            actions_ = actions + self.get_options( state )
+            return state, actions_, reward, episode_ended
 
