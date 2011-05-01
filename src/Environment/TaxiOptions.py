@@ -16,7 +16,7 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
         """
         @spec - Specification (size, endpoints, barriers); either exactly
                 specified in a file, or with numeric values in a list
-        @option_scheme - optimal|random|betweeness
+        @option_scheme - optimal|random|betweenness
         @max_steps - Number of steps that need to taken
         """
 
@@ -32,8 +32,8 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
             self.set_options( self.__get_small_world_options() )
         elif option_scheme == "random":
             self.set_options( self.__get_random_options() )
-        elif option_scheme == "betweeness":
-            self.set_options(self.__get_betweeness_options() )
+        elif option_scheme == "betweenness":
+            self.set_options(self.__get_betweenness_options() )
         else:
             raise NotImplemented() 
 
@@ -44,7 +44,8 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
         return OptionEnvironment.OptionEnvironment.react( self, action )
     
     def __make_option_from_paths( self, dest, paths ):
-        paths.pop( dest )
+        if paths.has_key( dest ):
+            paths.pop( dest )
         start = set( paths.keys() )
         stop = set( [dest] )
         policy = dict( [ (k,v[-2]) for k,v in paths.items() ] )
@@ -167,55 +168,66 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
 
         return options
 
-    def __get_betweeness_options(self):
+    def __get_betweenness_options(self):
         #get a reverse graph( directed edgesd being reversed in direction)
-        #calculate betweeness measure for the graph
-        #search though graph and get nodes with have local maximas of betweeness 
-        #arrange the nodes based on betweeness measure ( a list )
+        #calculate betweenness measure for the graph
+        #search though graph and get nodes with have local maximas of betweenness 
+        #arrange the nodes based on betweenness measure ( a list )
         #for each local maxima node:
         #     for all other nodes in the graph:
         #         find path to all these ( dictionary of dictionary )
         #augment the data structure by removing nodes removing paths with 
         #length smaller than minimum hop length and more than maximum hop length 
         #
-        pdb.set_trace()
         gr = self.graph.reverse()
+        """
+        for node in self.graph.nodes():
+            print str(node) + " : " + str(self.graph[node])
+
+        print " The reverse graph "
+        for node in gr.nodes():
+            print str(node) + " : " + str(gr[node])
+        """
         options = []
-        dict_betweeness_scores = nx.betweenness_centrality(self.graph, normalized=True, weighted=False)
+        dict_betweenness_scores = nx.betweenness_centrality(self.graph, normalized=True, weighted_edges=False)
         #list of nodes which are local maximas
-        local_maximas = _get_local_maximas(self.graph, dict_betweeness_scores)
-        local_maximas = _sort_descending_betweenness_scores(local_maximas, dict_betweeness_scores)
+        local_maximas = self._get_local_maximas(self.graph, dict_betweenness_scores)
+        local_maximas = self._sort_descending_betweenness_scores(local_maximas, dict_betweenness_scores)
         #the returned value is a dictionary of dictionary
-        local_maxima_paths = _get_paths_to_local_maximas(gr, local_maximas)
+
+        local_maxima_paths = self._get_paths_to_local_maximas(gr, local_maximas)
         #local_maxima_paths needs to be converted to a single dictionary 
-        for local_maxima in local_maxima_paths.keys():
-            option.append(__make_option_from_paths(local_maxima, local_maxima_paths[local_maxima]))
+        for local_maxima, paths in local_maxima_paths:
+            options.append(self.__make_option_from_paths(local_maxima, paths))
 
         return options
 
 
-    def _get_local_maximas(graph, dict_betweeness_scores):
+    def _get_local_maximas(self, graph, dict_betweenness_scores):
         #return list of local_maximas
         local_maximas = []
         for node in graph.nodes():
             is_local_maxima = True
             for neighbor in graph.neighbors(node):
-                if dict_betweeness_scores[neighbor] > dict_betweeness_scores[node]:
+                if dict_betweenness_scores[neighbor] > dict_betweenness_scores[node]:
                     is_local_maxima = False
                     break 
             if is_local_maxima:
-                local_maximas.append()
+                local_maximas.append(node)
 
         return local_maximas
 
-    def _sort_descending_betweenness_scores(local_maximas, dict_betweeness_scores):
+    def _sort_descending_betweenness_scores(self, local_maximas, dict_betweenness_scores):
         #sort the list of local_betweenness_maximum nodes
         #return sorted(reverse) list
 
         #not sure is this is an in 
         #place sort or it returns a sorted list
-        local_maximas = local_maximas.sort(key=lambda node: dict_betweeness_scores[node])
-        return local_maximas.reverse()
+        #the sort function sorts the list in place
+        local_maximas.sort(key=lambda node: dict_betweenness_scores[node])
+        local_maximas = local_maximas[len(local_maximas) : 0 : -1]
+        return local_maximas
+        #local_maximas.reverse() # why does it return an empty list
 
         """
         mylist.sort(key=lambda x: x.lower())
@@ -227,15 +239,11 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
         
     #gr is a reverse graph: hence you go looking 
     #for paths from local maximas from local maximas to other nodes: am I correct ??
-    def _get_paths_to_local_maximas(gr, local_maximas, dict_betweeness_scores):
+    def _get_paths_to_local_maximas(self, gr, local_maximas):
         #return a dictionary of dictionary of paths
-        final_filtered_shortest_paths = {}
-        filtered_shortest_paths = {}
         for local_maxima in local_maximas:
             paths = nx.shortest_path(gr, source=local_maxima)
-            for node, path in paths.items():
-                if len(path) < 2 and len(path) < 8:
-                    filtered_shortest_paths[node] = path
-            final_filtered_shortest_paths[local_maxima] = filtered_shortest_paths
+            paths = dict( [ (node,path) for node,path in paths.items() if len(path) < 8 ] )
+            yield local_maxima, paths
+        return 
 
-        return filtered_shortest_paths
