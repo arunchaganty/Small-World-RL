@@ -18,6 +18,8 @@ class Taxi(GraphEnvironment.GraphEnvironment):
     DEFAULT_SPEC = (5, 4, 2)
     road_map = None
     starts = None
+    steps = 1
+    best_steps = 1
     
     LEFT    = 2**1
     RIGHT   = 2**2
@@ -121,13 +123,20 @@ class Taxi(GraphEnvironment.GraphEnvironment):
         return pasn, dest, posx, posy
 
     def _start( self ):
+        # Find the optimality of the previous run
+        optimality = float( self.steps ) / self.best_steps
+        #print "Optimality: %d %d %f "%( self.steps, self.best_steps, optimality )
+        print "%f "%( optimality )
+
         starts = len(self.starts)
         road_size = self.road_map.shape[0]
 
-        node = np.random.randint( (starts-1) * starts * (road_size**2) )
-        self.pos = node
+        state = np.random.randint( (starts-1) * starts * (road_size**2) )
+        self.pos = state
+        self.best_steps = self.__get_min_step_count( state )
         self.steps = 0
-        return node, [ j for i,j in self.graph.edges( [node] ) ]
+
+        return state, [ j for i,j in self.graph.edges( [state] ) ]
 
     def _react( self, action ):
         self.steps += 1
@@ -243,4 +252,8 @@ class Taxi(GraphEnvironment.GraphEnvironment):
             for i in xrange(length):
                 road_map[ y0 + ((up^1)*i), x0 + up*i ] = 1
         return road_map, starts
+
+    def __get_min_step_count( self, state ):
+        goal = self.get_state( 0, 0, 0, 0 ) # Just a short cut to get goal state value
+        return nx.shortest_path_length( self.graph, state, goal )
 
