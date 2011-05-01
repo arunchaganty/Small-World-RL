@@ -1,0 +1,63 @@
+#!/usr/bin/env python2
+# vim:ft=python
+
+# Plots a file given title, axes labels and files
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+import operator
+import sys
+import pdb
+
+
+def plotValues(title, xlabel, ylabel, d_titles, valuesSet, xIdx=0):
+
+    plt.title( title )
+    plt.xlabel( xlabel )
+    plt.ylabel( ylabel )
+
+    for label, values in zip(d_titles, valuesSet):
+        if values.shape[0] == 1:
+            values = np.matrix(zip(np.arange(values.shape[1]), values.A[0]))
+
+        x = values.T[0].T
+        y = values.T[1:].T
+        plt.plot(x,y, label=label)
+    plt.legend()
+
+def main(*args):
+    # Get file
+    try:
+        title = args[0]
+        xlabel = args[1]
+        ylabel = args[2]
+        d_titles = args[3].split(',')
+        files = args[4].split(',')
+        if len(args) > 4:
+            out = args[5]
+        else:
+            out = sys.stdout
+    except IndexError:
+        print "Usage: %s <title> <xlabel> <ylabel> <data-title,data-title> <data-file,data-file> [<out-file>]"%(sys.argv[0])
+        sys.exit(1)
+
+    data = []
+    for f in files:
+        lines = open(f).readlines()
+        values = map(lambda line: map(float, line.split()), lines)
+        data.append(np.matrix(values))
+
+    plotValues(title, xlabel, ylabel, d_titles, data)
+
+    # Write to stdout
+    #plt.show()
+    plt.savefig(out)
+
+if __name__ == "__main__":
+    #try:
+    main(*sys.argv[1:])
+    #except StandardError as e:
+    #    print "Usage %s <title> <xlabel> <ylabel> <data-file>"%(sys.argv[0])
+    #    sys.exit(1)
+
