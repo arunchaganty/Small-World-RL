@@ -7,8 +7,10 @@
 # TeX
 *.log
 *.aux
+*.out
 *.pdf
 *.dvi
+*_tmp.tex
 
 # Data
 *.dot
