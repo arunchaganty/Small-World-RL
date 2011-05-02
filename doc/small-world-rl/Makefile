@@ -10,7 +10,7 @@ SECTIONS = macros.tex abstract.tex intro.tex theory.tex experiments.tex conclusi
 all: $(OUTPUT).pdf
 
 $(OUTPUT).pdf: $(FILE).tex ${FIGURES} $(SECTIONS) 
-	texify < $< > $(FILE)_tmp.tex 
+	./texify < $< > $(FILE)_tmp.tex 
 	pdflatex --file-line-error --interaction=nonstopmode $(FILE)_tmp.tex 
 	mv $(FILE)_tmp.pdf $@
 
