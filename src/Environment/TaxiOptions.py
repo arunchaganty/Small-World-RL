@@ -8,11 +8,10 @@ import scipy.sparse as sparse
 import OptionEnvironment
 import Taxi
 import networkx as nx
-import pdb
 
 class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
     # Environment Interface
-    def __init__(self, spec, option_scheme='none', max_steps=500 ):
+    def __init__(self, spec, option_scheme='none', n_actions=50, max_steps=500 ):
         """
         @spec - Specification (size, endpoints, barriers); either exactly
                 specified in a file, or with numeric values in a list
@@ -22,20 +21,24 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
 
         Taxi.Taxi.__init__( self, spec, max_steps )
         # Add options for all the optimal states
+        options = []
         if option_scheme == "none":
-            self.set_options( [] )
+            pass
         elif option_scheme == "manual":
-            self.set_options( self.__get_manual_options() )
+            options = self.__get_manual_options() 
         elif option_scheme == "optimal":
-            self.set_options( self.__get_optimal_options() )
+            options = self.__get_optimal_options() 
         elif option_scheme == "small-world":
-            self.set_options( self.__get_small_world_options() )
+            options = self.__get_small_world_options() 
         elif option_scheme == "random":
-            self.set_options( self.__get_random_options() )
+            options = self.__get_random_options() 
         elif option_scheme == "betweenness":
-            self.set_options(self.__get_betweenness_options() )
+            options =self.__get_betweenness_options() 
         else:
             raise NotImplemented() 
+        # Take a random set of options
+        np.random.shuffle( options )
+        self.set_options( options[ : n_actions ] )
 
     def start(self):
         return OptionEnvironment.OptionEnvironment.start( self )
@@ -111,7 +114,7 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
         return options
 
     def __make_option_from_path( self, start, stop, path ):
-        start = set( [start] )
+        start = set( path[:-1] )
         stop = set( [stop] )
         policy = dict( zip( path[:-1], path[1:] ) )
 
