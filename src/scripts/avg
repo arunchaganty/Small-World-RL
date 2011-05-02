@@ -1,0 +1,61 @@
+#!/usr/bin/env python2
+# vim:ft=python
+
+# Average over files specified in argument
+# Assumes first 'n' (default=1) columns are keys
+
+import operator
+import sys
+
+def tuple_add(t1, t2):
+    return tuple(map(lambda x: reduce(operator.add, x), zip(t1,t2)))
+
+def read_from_files(keyCount, files):
+    # Store for the files
+    table = {}
+
+    for f in files:
+        if f == "-":
+            f = sys.stdin
+        else:
+            f = open( f )
+        for line in f.readlines():
+            values = line.split()
+            key = tuple(values[:keyCount])
+            value = tuple(values[keyCount:])
+            # Use last index for count
+            key = tuple(key)
+            value = tuple(map(float, value)) + (1,)
+            if table.has_key(key):
+                table[key] = tuple_add(table[key], value)
+            else:
+                table[key] = value
+
+    # Average all fields 
+    for k, v in table.items():
+        table[k] = tuple(map(lambda x: x/v[-1], v[:-1])) + (v[-1],)
+
+    return table
+
+def main(*args):
+    keyCount = 1
+    files = []
+    if len(args) >= 2 and args[0] == "-k":
+        keyCount = args[1]
+        files = args[2:]
+    elif len(args) >= 1 and sys.argv[0] != "-k":
+        files = args[0:]
+    else:
+        print "Usage %s <list-of-files>"%(sys.argv[0])
+        print "Usage %s -k <n> <list-of-files>"%(sys.argv[0])
+        sys.exit(1)
+
+    values = read_from_files(keyCount, files)
+    values = [k+v for (k,v) in values.items()]
+    values.sort(key=lambda t:t[0])
+    for v in values:
+        print ' '.join(map(str,v))
+
+if __name__ == "__main__":
+    import sys
+    main(*sys.argv[1:])
