@@ -78,16 +78,18 @@ class Taxi(GraphEnvironment.GraphEnvironment):
             for i in xrange( road_size ):
                 tile = int( self.road_map[ j, i ] )
                 pos = j*road_size  + i
+                val += '|'
                 if pos == coords:
                     val_ = "*"
                 elif tile == 0:
                     val_ = " "
-                elif tile == 1:
+                elif tile / 2 > 0:
+                    tile = tile / 2
+                    val_ = chr(ord('A') - 1 + tile)
+                elif tile % 2 == 1:
                     val_ = "]"
-                elif tile < 0:
-                    val_ = chr(ord('A') - 1 - tile)
                 val += val_
-            val += '\n'
+            val += '|\n'
         return val
     
     def __repr__(self):
@@ -165,9 +167,9 @@ class Taxi(GraphEnvironment.GraphEnvironment):
         road_graph = sparse.lil_matrix( (road_size**2, road_size**2) )
         for j in xrange( road_size ):
             for i in xrange( road_size ):
-                if i > 0 and self.road_map[j,i-1] <> 1:
+                if i > 0 and self.road_map[j,i-1] % 2 <> 1:
                     road_graph[ road_size * (j) + (i), road_size * (j) + (i-1)] = self.LEFT
-                if i < road_size-1 and self.road_map[j,i] <> 1: 
+                if i < road_size-1 and self.road_map[j,i] % 2 <> 1: 
                     road_graph[ road_size * (j) + (i), road_size * (j) + (i+1)] = self.RIGHT
                 if j > 0:
                     road_graph[ road_size * (j) + (i), road_size * (j-1) + (i)] = self.UP
@@ -226,7 +228,7 @@ class Taxi(GraphEnvironment.GraphEnvironment):
 
         for i in xrange(len(starts)):
             tuple( reversed(starts[i]) )
-            road_map[ starts[i] ] = -(i+1)
+            road_map[ starts[i] ] += 2*(i+1)
 
         return road_map, starts
 
