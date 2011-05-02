@@ -130,7 +130,7 @@ class OptionEnvironment(Environment.Environment):
             self.__last_state_action = state, actions
             history.append( (state, None, actions_) )
 
-            return history, actions_, rewards, episode_ended 
+            return tuple(history), actions_, tuple(rewards), episode_ended 
                 
         else:
             state, actions, reward, episode_ended = self._react( action )
