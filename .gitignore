@@ -17,3 +17,7 @@
 *.png
 *.mat
 *.dat
+output-*/
+
+# Temporary stuff
+attic/
