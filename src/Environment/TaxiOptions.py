@@ -34,6 +34,10 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
             options = self.__get_random_options() 
         elif option_scheme == "betweenness":
             options =self.__get_betweenness_options() 
+        elif option_scheme == "msmall-world":
+            options = self.__get_small_world_options(markov=True) 
+        elif option_scheme == "mrandom":
+            options = self.__get_random_options(markov=True) 
         else:
             raise NotImplemented() 
         # Take a random set of options
@@ -113,7 +117,7 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
 
         return options
 
-    def __make_option_from_path( self, start, stop, path ):
+    def __make_markov_option_from_path( self, start, stop, path ):
         start = set( path[:-1] )
         stop = set( [stop] )
         policy = dict( zip( path[:-1], path[1:] ) )
@@ -122,7 +126,16 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
 
         return option
 
-    def __get_small_world_options( self, r = 2 ):
+    def __make_option_from_path( self, start, stop, path ):
+        start = set( [start] )
+        stop = set( [stop] )
+        policy = dict( zip( path[:-1], path[1:] ) )
+
+        option = OptionEnvironment.DeterministicOption( start, stop, policy )
+
+        return option
+
+    def __get_small_world_options( self, r = 2, markov = False ):
         # Get all the edges in the graph
         path_lengths = nx.shortest_path_length( self.graph )
         paths = nx.shortest_path( self.graph )
@@ -145,11 +158,14 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
             idx = np.random.multinomial(1, dists).argmax()
 
             dest = neighbours[ idx ]
-            options.append( self.__make_option_from_path( node, dest, paths[node][dest] ) )
+            if markov:
+                options.append( self.__make_markov_option_from_path( node, dest, paths[node][dest] ) )
+            else:
+                options.append( self.__make_option_from_path( node, dest, paths[node][dest] ) )
 
         return options
 
-    def __get_random_options( self ):
+    def __get_random_options( self, markov=False ):
         # Get all the edges in the graph
         paths = nx.shortest_path( self.graph )
 
@@ -167,7 +183,11 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
             dist = dist / sum(dist)
             idx = np.random.multinomial(1, dist).argmax()
 
-            options.append( self.__make_option_from_path( node, neighbours[idx], node_paths[idx] ) )
+            dest = neighbours[ idx ]
+            if markov:
+                options.append( self.__make_markov_option_from_path( node, dest, paths[node][dest] ) )
+            else:
+                options.append( self.__make_option_from_path( node, dest, paths[node][dest] ) )
 
         return options
 
@@ -238,7 +258,6 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
         x = [{'name': 'Homer', 'age': 39}, {'name': 'Bart', 'age':10}]
         sorted(x, key=mykey)
         """
-        
         
     #gr is a reverse graph: hence you go looking 
     #for paths from local maximas from local maximas to other nodes: am I correct ??
