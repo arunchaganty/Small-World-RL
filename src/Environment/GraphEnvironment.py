@@ -62,7 +62,7 @@ class GraphEnvironment(Environment.Environment):
         for i in xrange( graph_size ):
             s += '%d [label=""];\n'%(i)
         # For every edge
-        for i,j in self.graph.edges:
+        for i,j in self.graph.edges():
             if i < j:
                 s += '%d -- %d [label=""];\n'%(i,j)
         s += "}\n"
