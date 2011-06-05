@@ -11,6 +11,8 @@
 \usepackage{listings}
 \usepackage{algorithm}
 \usepackage{algorithmic}
+\usepackage{tikz}
+\usepackage{subfigure}
 
 \usepackage[
   pagebackref,
@@ -18,9 +20,9 @@
   extension=pdf,
 ]{hyperref}
 \hypersetup{ 
-  pdftitle          = {Exploring the Small-World Effect in Reinforcement Learning},
-  pdfsubject        = {Exploring the Small-World Effect in Reinforcement Learning},
-  pdfauthor         = {Arun Chaganty},
+  pdftitle          = {Is Learning Small World?},
+  pdfsubject        = {Is Learning Small World?},
+  pdfauthor         = {Arun Tejasvi Chaganty, Prateek Gaur},
   pdfkeywords       = {},
   pdfcreator        = {pdflatex},
   pdfproducer       = {LaTeX with hyperref and thumbpdf},
@@ -36,10 +38,10 @@
 
 \input{macros}
 
-\title{Exploring the Small-World Effect in Reinforcement Learning}
+\title{Is Learning Small World?}
 \author{ Arun Tejasvi Chaganty \inst{1} \and Prateek Gaur \inst{1} } 
 \institute{ Department of Computer Science and Engineering, \\
-            IIT Madras, Chennai, India - 500084 }
+            IIT Madras, Chennai, India - 600036 }
 
 \pagestyle{headings}  % switches on printing of running heads
 
@@ -54,13 +56,12 @@
 % Outline
 \input{abstract}
 \input{intro}
-\input{motivation}
-\input{algorithm}
+\input{theory}
 \input{experiments}
 \input{conclusions}
 
-\bibliography{library}{}
 \bibliographystyle{alpha}
+\bibliography{library}{}
 
 %\newpage
 %\appendix
