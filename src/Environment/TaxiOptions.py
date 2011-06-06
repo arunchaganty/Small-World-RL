@@ -8,6 +8,7 @@ import scipy.sparse as sparse
 import OptionEnvironment
 import Taxi
 import networkx as nx
+import pdb
 
 class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
     # Environment Interface
@@ -15,7 +16,8 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
         """
         @spec - Specification (size, endpoints, barriers); either exactly
                 specified in a file, or with numeric values in a list
-        @option_scheme - optimal|random|betweenness
+        @option_scheme - none|manual|optimal|small-world|random|ozgur's betweenness|ozgur's randomness|end
+        comment : optimal(shortest path to destination)??|random|ozgur's betweenness|ozgur's randomness
         @max_steps - Number of steps that need to taken
         """
 
@@ -33,16 +35,23 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
         elif option_scheme == "random":
             options = self.__get_random_options() 
         elif option_scheme == "betweenness":
-            options =self.__get_betweenness_options() 
+            options = self.__get_betweenness_options() 
         elif option_scheme == "msmall-world":
-            options = self.__get_small_world_options(markov=True) 
+            options = self.__get_small_world_options( markov=True ) 
         elif option_scheme == "mrandom":
-            options = self.__get_random_options(markov=True) 
+            options = self.__get_random_options( markov=True ) 
+        elif option_scheme == "ozgur-random":
+            options = self.__get_ozgur_random_options( n_actions )
         else:
             raise NotImplemented() 
-        # Take a random set of options
-        np.random.shuffle( options )
-        self.set_options( options[ : n_actions ] )
+
+        if option_scheme == "betweenness":
+            # Take the best set
+            self.set_options( options[ : n_actions ] )
+        else:
+            # Take a random set of options
+            np.random.shuffle( options )
+            self.set_options( options[ : n_actions ] )
 
     def start(self):
         return OptionEnvironment.OptionEnvironment.start( self )
@@ -63,6 +72,14 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
 
     def __get_optimal_options( self ):
         # Reverse the graph to get the shortest paths to state
+        # there is something natural options that sir was talking about
+        # here, I do not remember it well, but it was do the 
+        # options that are returned resemeble the actions that
+        # the agent can take in real world, and not some shady
+        # actions which we derive just based on the interaction 
+        # graph
+        # that is the sequence which these options represent can 
+        # actually be performed in real world
         gr = self.graph.reverse()
         options = []
         
@@ -192,16 +209,16 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
         return options
 
     def __get_betweenness_options(self):
-        #get a reverse graph( directed edgesd being reversed in direction)
+        #get a reverse graph( directed edges being reversed in direction)
         #calculate betweenness measure for the graph
-        #search though graph and get nodes with have local maximas of betweenness 
+        #search though graph and get nodes which have local maximas of betweenness 
         #arrange the nodes based on betweenness measure ( a list )
         #for each local maxima node:
         #     for all other nodes in the graph:
         #         find path to all these ( dictionary of dictionary )
         #augment the data structure by removing nodes removing paths with 
         #length smaller than minimum hop length and more than maximum hop length 
-        #
+        
         gr = self.graph.reverse()
         """
         for node in self.graph.nodes():
@@ -218,7 +235,7 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
         local_maximas = self._sort_descending_betweenness_scores(local_maximas, dict_betweenness_scores)
         #the returned value is a dictionary of dictionary
 
-        local_maxima_paths = self._get_paths_to_local_maximas(gr, local_maximas)
+        local_maxima_paths = self._get_paths_to_nodes(gr, local_maximas)
         #local_maxima_paths needs to be converted to a single dictionary 
         for local_maxima, paths in local_maxima_paths:
             options.append(self.__make_option_from_paths(local_maxima, paths))
@@ -261,11 +278,31 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
         
     #gr is a reverse graph: hence you go looking 
     #for paths from local maximas from local maximas to other nodes: am I correct ??
-    def _get_paths_to_local_maximas(self, gr, local_maximas):
+    def _get_paths_to_nodes(self, gr, nodes):
         #return a dictionary of dictionary of paths
-        for local_maxima in local_maximas:
-            paths = nx.shortest_path(gr, source=local_maxima)
-            paths = dict( [ (node,path) for node,path in paths.items() if len(path) < 8 ] )
-            yield local_maxima, paths
+        for node in nodes:
+            paths = nx.shortest_path(gr, source=node)
+            paths = dict( filter( lambda n, path: len(path) < 8, paths.items() ) )
+            yield node, paths
         return 
+
+
+    def __get_ozgur_random_options(self, count):
+        #get a reverse graph( directed edges being reversed in direction)
+        #select some bunch
+        #create paths from all nodes to these graphs
+        #and I guess that is it.
+
+        random_states = self.graph.nodes()[:]
+        np.random.shuffle(random_states)
+        random_states = random_states[:count]
+
+        options = []
+        gr = self.graph.reverse()
+        my_paths = self._get_paths_to_nodes(gr, random_states) #function being reused here
+        #local_maxima_paths needs to be converted to a single dictionary 
+        for node, paths in my_paths:
+            options.append(self.__make_option_from_paths(node, paths))
+
+        return options
 
