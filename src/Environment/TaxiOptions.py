@@ -64,7 +64,7 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
             paths.pop( dest )
         start = set( paths.keys() )
         stop = set( [dest] )
-        policy = dict( [ (k,v[-2]) for k,v in paths.items() ] )
+        policy = dict( map( lambda k,v: (k,v[-2]),  paths.items() ) )
 
         option = OptionEnvironment.DeterministicOption( start, stop, policy )
 

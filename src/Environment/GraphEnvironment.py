@@ -29,7 +29,7 @@ class GraphEnvironment(Environment.Environment):
         # Choose a random node in the graph
         node = np.random.randint( len( self.graph ) )
         self.pos = node
-        return state, tuple( ( j for i,j in self.graph.edges( [state] ) ) )
+        return state, tuple( self.graph.neighbors( state ) )
 
     def _react(self, action):
         """React to action
@@ -43,14 +43,15 @@ class GraphEnvironment(Environment.Environment):
         reward = self.graph.edge[self.pos][action].get( "reward", 0 )
 
         self.pos = node = action
-        actions = tuple( ( j for i,j in self.graph.edges( [node] ) ) )
+        actions = tuple( self.graph.neighbors( node ) )
         reward += self.graph.node[node].get( "reward", 0 )
         episode_ended = self.graph.node[node].get( "end?", False )
 
+        bias = self.graph.graph["reward_bias"]
         if episode_ended:
             node, actions = self._start()
             
-        return node, actions, reward, episode_ended
+        return node, actions, reward + bias, episode_ended
     
     def to_dot(self):
         graph_size = len(self.graph)

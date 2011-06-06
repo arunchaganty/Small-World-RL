@@ -28,10 +28,10 @@ class Taxi(GraphEnvironment.GraphEnvironment):
     PICKUP  = 2**5
     PUTDOWN = 2**6
 
-    REWARD_BIAS = -1
+    REWARD_BIAS = -0.001
     REWARD_FAILURE = -1 - REWARD_BIAS
-    REWARD_SUCCESS = 100 - REWARD_BIAS
-    REWARD_CHECKPOINT = 10 - REWARD_BIAS
+    REWARD_SUCCESS = 1 - REWARD_BIAS
+    REWARD_CHECKPOINT = 0.1 - REWARD_BIAS
 
     # Environment Interface
     def __init__(self, spec, max_steps=500 ):
@@ -138,7 +138,7 @@ class Taxi(GraphEnvironment.GraphEnvironment):
         self.best_steps = self.__get_min_step_count( state )
         self.steps = 0
 
-        return state, tuple( ( j for i,j in self.graph.edges( (state) ) ) )
+        return state, tuple( self.graph.neighbors( state ) )
 
     def _react( self, action ):
         self.steps += 1

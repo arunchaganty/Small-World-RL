@@ -49,7 +49,7 @@ class DeterministicOption( Option ):
 
     def should_stop(self, state):
         """Check if the option should be stopped"""
-        return state in self.stop
+        return state in self.stop # or state not in self.policy
 
     def execute(self, state, actions ):
         """Choose an option as per the policy"""
@@ -75,8 +75,7 @@ class OptionEnvironment(Environment.Environment):
         """Get all relevant options for the state"""
         # Memoise - saves naming pains
         if not self.option_store.has_key( state ):
-            self.option_store[ state ] = tuple( ( option for option in self.options if 
-                option.can_start( state ) ) )
+            self.option_store[ state ] = tuple( filter( lambda option: option.can_start( state ), self.options ) )
         return self.option_store[ state ]
 
     def start(self):

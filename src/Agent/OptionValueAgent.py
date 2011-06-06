@@ -16,20 +16,22 @@ class OptionValueAgent(ValueAgent.ValueAgent):
     Generic Value-based agent
     """
 
-    def register_state_action( self, state, actions ):
-        if not self.Q.has_key( state ):
-            self.Q[state] = {}
-        for action in actions:
-            if not self.Q[state].has_key(action):
-                self.Q[state][action] = 0
-
     def act(self, state, actions, reward, episode_ended):
         if isinstance( self.old_action, Option ):
             for st, a, as_ in state:
-                self.register_state_action( st, as_ )
+                if not self.Q.has_key( st ):
+                    self.Q[st] = {}
+                for a_ in as_:
+                    if not self.Q[st].has_key(a_):
+                        self.Q[st][a_] = 0
             state_ = state[-1][0]
         else:
-            self.register_state_action( state, actions )
+            st, as_ = state, actions
+            if not self.Q.has_key( st ):
+                self.Q[st] = {}
+            for a_ in as_:
+                if not self.Q[st].has_key(a_):
+                    self.Q[st][a_] = 0
             state_ = state
 
         # Explore
@@ -37,9 +39,9 @@ class OptionValueAgent(ValueAgent.ValueAgent):
             action = choose( actions )
         # Exploit
         else:
-            max_value = max( [ self.Q[state_][a] for a in actions ] )
+            max_value = max( map( lambda a: self.Q[state_][a], actions ) )
             #pdb.set_trace()
-            action = choose( [ a for a in actions if self.Q[state_][a] == max_value ] )
+            action = choose( filter( lambda a: self.Q[state_][a] == max_value, actions ) )
 
         # Update actions
         if episode_ended:
