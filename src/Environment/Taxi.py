@@ -3,8 +3,8 @@ Taxi Environment
 """
 
 import numpy as np
-import scipy
-import scipy.sparse as sparse
+# import scipy
+# import scipy.sparse as sparse
 import networkx as nx
 import GraphEnvironment
 
@@ -29,9 +29,9 @@ class Taxi(GraphEnvironment.GraphEnvironment):
     PUTDOWN = 2**6
 
     REWARD_BIAS = -1
-    REWARD_FAILURE = -1 - REWARD_BIAS
-    REWARD_SUCCESS = 100 - REWARD_BIAS
-    REWARD_CHECKPOINT = 10 - REWARD_BIAS
+    REWARD_FAILURE = -10 - REWARD_BIAS
+    REWARD_SUCCESS = 50 - REWARD_BIAS
+    REWARD_CHECKPOINT = 0.0 - REWARD_BIAS
 
     # Environment Interface
     def __init__(self, spec, max_steps=500 ):
@@ -138,7 +138,7 @@ class Taxi(GraphEnvironment.GraphEnvironment):
         self.best_steps = self.__get_min_step_count( state )
         self.steps = 0
 
-        return state, tuple( ( j for i,j in self.graph.edges( (state) ) ) )
+        return state, tuple( self.graph.neighbors( state ) )
 
     def _react( self, action ):
         self.steps += 1
@@ -160,11 +160,11 @@ class Taxi(GraphEnvironment.GraphEnvironment):
         in_taxi = starts = len(self.starts)
         road_size = self.road_map.shape[0]
         size = (road_size**2) * (starts) * (starts) + 1
-        graph = sparse.lil_matrix( (size, size) )
+        graph = np.zeros( (size, size), dtype = np.int )
         get_state = self.get_state
 
         # Road map matrix (Symmetrise?)
-        road_graph = sparse.lil_matrix( (road_size**2, road_size**2) )
+        road_graph = np.zeros( (road_size**2, road_size**2), dtype = np.int )
         for j in xrange( road_size ):
             for i in xrange( road_size ):
                 if i > 0 and self.road_map[j,i-1] % 2 <> 1:
@@ -216,7 +216,7 @@ class Taxi(GraphEnvironment.GraphEnvironment):
 
         spec = map( str.strip, open( spec_file ).readlines() )
         size = int( spec[0] )
-        road_map = np.zeros( (size,size) )
+        road_map = np.zeros( (size,size), dtype = np.int )
 
         # HACK: Unsafe code here
         starts = map(eval, spec[1].split())
@@ -240,13 +240,11 @@ class Taxi(GraphEnvironment.GraphEnvironment):
         @edges - No. of edges
         """
 
-        road_map = np.zeros( size, size )
+        road_map = np.zeros( (size, size), dtype = np.int )
 
-        starts = [ (np.random.randint(size), np.random.randint(size)) \
-                for i in starts ] 
+        starts = [ (np.random.randint(size), np.random.randint(size)) ] * len( starts )
         # TODO: Something that makes sense here
-        edges = [ (np.random.randint(size), np.random.randint(size), 0, 2) 
-                    for i in edges ] 
+        edges = [ (np.random.randint(size), np.random.randint(size), 0, 2) ] * len( edges )
 
         for i in xrange(len(starts)):
             road_map[ starts[i] ] = -i

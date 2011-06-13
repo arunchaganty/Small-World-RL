@@ -45,7 +45,7 @@ class IntraOptionQ(OptionValueAgent.OptionValueAgent):
                 st_, a_, al_ = state_[i+1]
 
                 if st_:
-                    max_a = max( ( x for x in al_ if not isinstance(x, Option) ), key = lambda x: self.Q[st_].get(x,0) )
+                    max_a = max( filter( lambda x: not isinstance(x, Option), al_ ), key = lambda x: self.Q[st_].get(x,0) )
                 else:
                     max_a = None
 

@@ -6,10 +6,9 @@ RL TestBed
 import Runner
 
 import re
+import collections
 import Agent
 import Environment
-
-__time__ = 0
 
 class ArgumentError(StandardError):
     def __init__(self, msg):
@@ -17,23 +16,8 @@ class ArgumentError(StandardError):
     def __str__(self):
         return self.msg
 
-def verbose_post_act_hook(env, agent, state, actions, action):
-    """Do something after an action has been chosen"""
-    global __time__
-    print env
-
-def quiet_post_act_hook(env, agent, state, actions, action):
-    """Do something after an action has been chosen"""
-    pass
-
-def post_react_hook(env, agent, state, actions, reward, episode_ended):
-    """Do something after the environment handles an action"""
-    global __time__
-    if episode_ended:
-        #print __time__, reward
-        __time__ = 0
-    else:
-        __time__ += 1
+def print_status( percent ):
+    sys.stderr.write( "\rProgress: %f%%"%(percent) )
 
 def main(epochs, agent_str, agent_args, env_str, env_args, verbose):
     """RL Testbed.
@@ -45,15 +29,17 @@ def main(epochs, agent_str, agent_args, env_str, env_args, verbose):
     """
     # Load agent and environment
 
+    # Initialise environment and agent
     agent, env = load(agent_str, agent_args, env_str, env_args)
     runner = Runner.Runner(agent, env)
-    if verbose:
-        runner.post_act_hook = verbose_post_act_hook
-    else:
-        runner.post_act_hook = quiet_post_act_hook
-    runner.post_react_hook = post_react_hook
+    total_rewards = runner.run(epochs)
+    f = open( "rl.out", "w")
+    i = 0
+    for r in total_rewards:
+        f.write( "%d %f\n"%(i, r) )
+        i+=1
+    f.close()
 
-    runner.run(epochs)
 
 def load(agent_str, agent_args, env_str, env_args):
     """Try to load a class for agents or environment"""
@@ -116,11 +102,11 @@ if __name__ == "__main__":
                     epochs = int(sys.argv[1])
 
                 agent_str = sys.argv[2].split(":")
-                agent_args = [convert(arg) for arg in agent_str[1:]]
+                agent_args = map( convert, agent_str[1:] )
                 agent_str = agent_str[0]
 
                 env_str = sys.argv[3].split(":")
-                env_args = [convert(arg) for arg in env_str[1:]]
+                env_args = map( convert, env_str[1:] )
                 env_str = env_str[0]
 
                 main(epochs, agent_str, agent_args, env_str, env_args, verbose)
