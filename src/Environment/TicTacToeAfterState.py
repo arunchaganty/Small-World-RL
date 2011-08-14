@@ -77,7 +77,7 @@ class TicTacToeAfterState(Environment.Environment):
         return "[TicTacToe %d]" % (id(self))
 
     def _start(self):
-        board, actions, reward, episode_ended = self.restart(0)
+        board, actions, reward, episode_ended, epochs = self.restart(0)
         return board, actions
 
     def restart(self, reward):
@@ -101,7 +101,7 @@ class TicTacToeAfterState(Environment.Environment):
 
         self.after_state = False
 
-        return self.board, self.__get_actions(), reward, True
+        return self.board, self.__get_actions(), reward, True, 1
 
     def _react(self, action):
         # Check action
@@ -119,7 +119,7 @@ class TicTacToeAfterState(Environment.Environment):
             self.after_state = True
 
             # Otherwise continue
-            return self.board, [()], 0, False
+            return self.board, [()], 0, False, 1
         else:
             # Play opponent turn
             board, actions = copy.deepcopy(self.board), self.__get_actions()

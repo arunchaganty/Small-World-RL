@@ -51,7 +51,7 @@ class GraphEnvironment(Environment.Environment):
         if episode_ended:
             node, actions = self._start()
             
-        return node, actions, reward + bias, episode_ended
+        return node, actions, reward + bias, episode_ended, 1
     
     def to_dot(self):
         graph_size = len(self.graph)

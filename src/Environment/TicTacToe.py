@@ -72,7 +72,7 @@ class TicTacToe(Environment.Environment):
         return "[TicTacToe %d]" % (id(self))
 
     def _start(self):
-        board, actions, reward, episode_ended = self.restart(0)
+        board, actions, reward, episode_ended, epochs = self.restart(0)
         return board, actions
 
     def restart(self, reward):
@@ -94,7 +94,7 @@ class TicTacToe(Environment.Environment):
         else:
             self.opponent_mark = PLAYER_O
 
-        return self.board, self.__get_actions(), reward, True
+        return self.board, self.__get_actions(), reward, True, 1
 
     def _react(self, action):
         # Check action
@@ -118,7 +118,7 @@ class TicTacToe(Environment.Environment):
             return self.restart(reward)
 
         # Otherwise continue
-        return self.board, self.__get_actions(), reward, False
+        return self.board, self.__get_actions(), reward, False, 1
 
     def __init_board(self):
         """Return the empty board - all PLAYER_N"""

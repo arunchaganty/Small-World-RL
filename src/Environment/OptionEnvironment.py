@@ -102,7 +102,7 @@ class OptionEnvironment(Environment.Environment):
             action = option.execute( state, actions )
             history.append( (state, action, actions_) )
 
-            state, actions, reward, episode_ended = self._react( action )
+            state, actions, reward, episode_ended, epochs = self._react( action )
             rewards.append( reward )
 
             self.__last_state_action = state, actions
@@ -111,14 +111,14 @@ class OptionEnvironment(Environment.Environment):
             # Quit if the episode has ended
             if episode_ended:
                 history.append( (state, None, actions_) )
-                return history, actions_, (reward,), episode_ended 
+                return history, actions_, (reward,), episode_ended, 1
                 
             while not option.should_stop( state ):
                 # Get the action from the option
                 action = option.execute( state, actions )
                 history.append( (state, action, actions_ ) )
 
-                state, actions, reward, episode_ended = self._react( action )
+                state, actions, reward, episode_ended, epochs = self._react( action )
                 rewards.append( reward )
 
                 actions_ = actions + self.get_options( state )
@@ -129,11 +129,11 @@ class OptionEnvironment(Environment.Environment):
             self.__last_state_action = state, actions
             history.append( (state, None, actions_) )
 
-            return tuple(history), actions_, tuple(rewards), episode_ended 
+            return tuple(history), actions_, tuple(rewards), episode_ended, len( rewards )
                 
         else:
-            state, actions, reward, episode_ended = self._react( action )
+            state, actions, reward, episode_ended, epochs = self._react( action )
             self.__last_state_action = state, actions
             actions_ = actions + self.get_options( state )
-            return state, actions_, reward, episode_ended
+            return state, actions_, reward, episode_ended, 1
 

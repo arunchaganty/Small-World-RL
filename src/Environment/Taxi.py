@@ -127,8 +127,8 @@ class Taxi(GraphEnvironment.GraphEnvironment):
     def _start( self ):
         # Find the optimality of the previous run
         optimality = float( self.steps ) / self.best_steps
-        #print "Optimality: %d %d %f "%( self.steps, self.best_steps, optimality )
-        print "%f "%( optimality )
+        #NOTE: print "Optimality: %d %d %f "%( self.steps, self.best_steps, optimality )
+        #NOTE: print "%f "%( optimality )
 
         starts = len(self.starts)
         road_size = self.road_map.shape[0]
@@ -146,7 +146,7 @@ class Taxi(GraphEnvironment.GraphEnvironment):
             node, actions = self._start()
             reward = self.REWARD_FAILURE
             episode_ended = True
-            return node, actions, reward, episode_ended
+            return node, actions, reward, episode_ended, 1
         else:
             return GraphEnvironment.GraphEnvironment._react( self, action )
 
