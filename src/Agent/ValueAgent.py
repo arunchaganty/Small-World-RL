@@ -17,7 +17,7 @@ class ValueAgent(Agent.Agent):
 
     Q = {}
 
-    def __init__(self, gamma = 0.9, alpha = 0.8, e = 0.1, rate = 0.1):
+    def __init__(self, gamma = 0.9, alpha = 0.1, e = 0.05, rate = 0.001):
         Agent.Agent.__init__(self)
         self.gamma = gamma
         self.alpha = alpha

@@ -3,8 +3,6 @@ TaxiOptions Environment
 """
 
 import numpy as np
-import scipy
-import scipy.sparse as sparse
 import OptionEnvironment
 import Taxi
 import networkx as nx
@@ -229,7 +227,7 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
             print str(node) + " : " + str(gr[node])
         """
         options = []
-        dict_betweenness_scores = nx.betweenness_centrality(self.graph, normalized=True, weighted_edges=False)
+        dict_betweenness_scores = nx.betweenness_centrality(self.graph, normalized=True)
         #list of nodes which are local maximas
         local_maximas = self._get_local_maximas(self.graph, dict_betweenness_scores)
         local_maximas = self._sort_descending_betweenness_scores(local_maximas, dict_betweenness_scores)
@@ -282,7 +280,7 @@ class TaxiOptions(Taxi.Taxi, OptionEnvironment.OptionEnvironment):
         #return a dictionary of dictionary of paths
         for node in nodes:
             paths = nx.shortest_path(gr, source=node)
-            paths = dict( filter( lambda n, path: len(path) < 8, paths.items() ) )
+            paths = dict( [ (n, path) for (n,path) in paths.items() if len(path) < 8 ] )
             yield node, paths
         return 
 

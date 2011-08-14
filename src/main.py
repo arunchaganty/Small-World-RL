@@ -32,7 +32,14 @@ def main(epochs, agent_str, agent_args, env_str, env_args, verbose):
     # Initialise environment and agent
     agent, env = load(agent_str, agent_args, env_str, env_args)
     runner = Runner.Runner(agent, env)
-    runner.run(epochs)
+    total_rewards = runner.run(epochs)
+    f = open( "rl.out", "w")
+    i = 0
+    for r in total_rewards:
+        f.write( "%d %f\n"%(i, r) )
+        i+=1
+    f.close()
+
 
 def load(agent_str, agent_args, env_str, env_args):
     """Try to load a class for agents or environment"""

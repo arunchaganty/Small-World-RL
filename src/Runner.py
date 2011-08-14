@@ -34,13 +34,19 @@ class Runner:
         state, actions = self.env.start()
         reward = 0
         episode_ended = True
+        total_reward = [0]
 
         while episodes > 0:
             action = self.agent.act(state, actions, reward, episode_ended)
             #if self.post_act_hook: self.post_act_hook(self.env, self.agent, state, actions, action)
             state, actions, reward, episode_ended = self.env.react(action)
             #if self.post_react_hook: self.post_react_hook(self.env, self.agent, state, actions, reward, episode_ended)
+            if isinstance(reward, collections.Iterable):
+                for r in reward: total_reward.append( total_reward[-1] + r )
+            else:
+                total_reward.append( total_reward[-1] + reward )
 
             if episode_ended: 
                 episodes -= 1
+        return total_reward
 
