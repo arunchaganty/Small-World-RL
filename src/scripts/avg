@@ -30,6 +30,7 @@ def read_from_files(keyCount, files):
                 table[key] = tuple_add(table[key], value)
             else:
                 table[key] = value
+        f.close()
 
     # Average all fields 
     for k, v in table.items():
