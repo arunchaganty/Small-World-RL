@@ -2,14 +2,11 @@
 Implements the Macro Q-Learning Algorithm
 """
 
-import OptionValueAgent
-import collections
-import operator
-from Environment.OptionEnvironment import Option
-import pdb
+from Agent import *
+from Environment import *
 from numpy import random
 
-class MacroQ(OptionValueAgent.OptionValueAgent):
+class MacroQ(OptionValueAgent):
     """
     Implements the Q-Learning
     """
@@ -26,21 +23,22 @@ class MacroQ(OptionValueAgent.OptionValueAgent):
         if not state:
             return
 
-        q = self.Q[state][action]
-        # Check if the state is a list for actions
+        q = self.get_value( state, action )
+
+        # If action is an option,
         if isinstance( action, Option ):
             if state_:
                 state_ = state_[-1][0]
             k = len(reward)
-            reward = sum( ( self.gamma**i * reward[i] for i in xrange(k) ) )
+            reward = np.sum( np.exp( self.gamma * np.ones( k ), np.arange( k ) ) * np.array( reward ) )
         else:
             k = 1
 
         if not state_:
             q += self.alpha * (reward - q)
         else:
-            q_ = max(self.Q[state_].values())
-            q += self.alpha * (reward + (self.gamma**k) * q_ - q)
+            q_ = max( ( pr for (a_,pr) in self.Q[state_] ) )
+            q += self.alpha * (reward + np.power(self.gamma, k) * q_ - q)
 
-        self.Q[state][action] = q
+        self.set_value( state, action, q )
 

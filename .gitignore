@@ -2,7 +2,10 @@
 *.swp
 *.swo
 *.pyc
+*.pyo
 *.o
+cscope.out
+tags
 
 # TeX
 *.log
