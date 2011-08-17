@@ -1,25 +1,27 @@
 """
-Implements the Q-Learning
+RL Framework
+Authors: Arun Chaganty
+Implements SARSA
 """
 
-import ValueAgent
-from numpy import random
+from Agent import *
 
-class QLearning(ValueAgent.ValueAgent):
+class SARSA(ValueAgent):
     """
-    Implements the Q-Learning
+    Implements SARSA
     """
 
     def update_Q(self, state, action, state_, action_, reward):
         if not state:
             return
 
-        q = self.Q[state][action]
+        q = self.get_value( state, action )
+
         if not state_:
             q += self.alpha * (reward - q)
         else:
-            q_ = max(self.Q[state_].values())
+            q_ = self.get_value( state_, action_ )
             q += self.alpha * (reward + self.gamma * q_ - q)
 
-        self.Q[state][action] = q
+        self.set_value( state, action, q )
 
