@@ -56,10 +56,14 @@ class Runner:
         reward = 0
         episode_ended = True
         ret = []
+        decision_table = {}
 
         epoch = 0
+        episode_epochs = decisions = 0
+        started = False # Only collect after a while
         while epoch < epochs:
             action = agent.act(state, reward, episode_ended)
+            decisions += 1
             state, reward, episode_ended = self.env.react(action)
 
             # Add rewards to ret
@@ -68,10 +72,22 @@ class Runner:
                 # returned.
                 ret += reward
                 epoch += len( state ) - 1
+                episode_epochs += len( state ) - 1
             else:
                 ret.append( reward )
                 epoch += 1
+                episode_epochs += 1
+
+            if not started and epoch > int( epochs * 0.9 ):
+                started = True
+                decision_table = {}
+                episode_epochs = decisions = 0
+
+            if started and episode_ended:
+                decisions_, count = decision_table.get( episode_epochs, (0,0) )
+                decision_table[ episode_epochs ] = decisions_ + decisions, count+1
+                episode_epochs = decisions = 0
 
         # Chop off any extras
-        return ret[ : epochs ]
+        return ret[ : epochs ], decision_table
 
