@@ -173,7 +173,7 @@ class OptionEnvironment( Environment ):
             action = max( actions, key = lambda (a,pr): pr )[ 0 ]
 
             pi[ src ] = ((action, 1.0),)
-        B = {}
+        B = { dest : 1.0 }
         
         return Option( I, pi, B )
 
@@ -211,7 +211,7 @@ class OptionEnvironment( Environment ):
             action = max( actions, key = lambda (a,pr): pr )[ 0 ]
 
             pi[ src ] = ((action, 1.0),)
-        B = {}
+        B = { dest : 1.0 }
         
         return Option( I, pi, B )
 
