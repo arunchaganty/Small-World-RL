@@ -1,5 +1,6 @@
 \documentclass[a4paper]{llncs}
-%\usepackage{fullpage}
+\usepackage[margin=1.5cm]{geometry}
+%\usepackage{fullpage}[1in]
 %\usepackage{palatino}
 
 \usepackage{makeidx}
@@ -20,8 +21,8 @@
   extension=pdf,
 ]{hyperref}
 \hypersetup{ 
-  pdftitle          = {Is Learning Small World?},
-  pdfsubject        = {Is Learning Small World?},
+  pdftitle          = {Learning in a Small World},
+  pdfsubject        = {Learning in a Small World},
   pdfauthor         = {Arun Tejasvi Chaganty, Prateek Gaur},
   pdfkeywords       = {},
   pdfcreator        = {pdflatex},
@@ -38,8 +39,8 @@
 
 \input{macros}
 
-\title{Is Learning Small World?}
-\author{ Arun Tejasvi Chaganty \inst{1} \and Prateek Gaur \inst{1} } 
+\title{Learning in a Small World}
+\author{ Arun Tejasvi Chaganty \and Prateek Gaur \and Ravindran Balaraman \inst{1} } 
 \institute{ Department of Computer Science and Engineering, \\
             IIT Madras, Chennai, India - 600036 }
 
@@ -54,14 +55,12 @@
 %\pagebreak
 
 % Outline
-\input{abstract}
 \input{intro}
 \input{theory}
 \input{experiments}
-\input{conclusions}
 
-\bibliographystyle{alpha}
-\bibliography{library}{}
+\bibliographystyle{amsalpha}
+\bibliography{ewrl}{}
 
 %\newpage
 %\appendix

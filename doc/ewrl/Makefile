@@ -4,13 +4,14 @@
 # $Id$
 FILE = report
 OUTPUT = $(shell basename $(PWD))
-FIGURES =
+FIGURES = 
+FIGURES_CUSTOM = figures/rooms-options.pdf
 SECTIONS = macros.tex abstract.tex intro.tex theory.tex experiments.tex conclusions.tex\
 		   taxi.tex
 
 all: $(OUTPUT).pdf
 
-$(OUTPUT).pdf: $(FILE).tex ${FIGURES} $(SECTIONS) 
+$(OUTPUT).pdf: $(FILE).tex ${FIGURES} ${FIGURES_CUSTOM} $(SECTIONS) 
 	./texify < $< > $(FILE)_tmp.tex 
 	pdflatex --file-line-error --interaction=nonstopmode $(FILE)_tmp.tex 
 	bibtex $(FILE)_tmp
@@ -22,6 +23,12 @@ $(FILE).pdf: $(FILE).tex ${FIGURES}
 
 ${FIGURES}: %.pdf : %.eps 
 	epstopdf --autorotate=All $^
+
+figures/rooms-options.pdf: rooms.tex
+	pdflatex -shell-escape $^;
+	mv $(^:.tex=-figure0.pdf) $@;
+	rm -f $(^:.tex=-)*
+	rm -f $(^:.tex=.auxlock)
 
 .PHONY: clean
 
