@@ -294,7 +294,7 @@ class OptionEnvironment( Environment ):
                 continue
             neighbours, dists = zip( *dists.items() )
             # Create a pr distribution
-            dists = np.power( np.array( dists, dtype=float ), r )
+            dists = np.power( np.array( dists, dtype=float ), -r )
             # Zero out neighbours
             for i in xrange( len( dists ) ):
                 if dists[i] == 1: dists[i] = 0
