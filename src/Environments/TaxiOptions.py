@@ -42,12 +42,12 @@ class TaxiOptions( OptionEnvironment ):
         elif scheme == "betweenness":
             O = OptionEnvironment.make_options_from_betweenness( g, gr, count, *args )
         elif scheme == "small-world":
-            O = OptionEnvironment.make_options_from_betweenness( g, gr, count, *args )
+            O = OptionEnvironment.make_options_from_small_world( g, gr, count, False, *args )
+        elif scheme == "betweenness+small-world":
+            O = OptionEnvironment.make_options_from_betweenness( g, gr, count )
             count_ = count - len( O ) 
             print count_ 
             O += OptionEnvironment.make_options_from_small_world( g, gr, count_, False, *args )
-        elif scheme == "betweenness+small-world":
-            O = OptionEnvironment.make_options_from_small_world( g, gr, count, False, *args )
         elif scheme == "msmall-world":
             O = OptionEnvironment.make_options_from_small_world( g, gr, count, True, *args )
         else:
