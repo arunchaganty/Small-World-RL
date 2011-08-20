@@ -21,13 +21,14 @@ class Environment:
 
     state = 0
 
-    def __init__( self, S, A, P, R, R_bias, start_set = None ):
+    def __init__( self, S, A, P, R, R_bias, start_set, end_set ):
         self.S = S 
         self.A = A 
         self.P = P
         self.R = R
         self.R_bias = R_bias
-        self.start_set = None
+        self.start_set = start_set
+        self.end_set = end_set
 
         # State action set for MDP
         Q = []
@@ -61,7 +62,11 @@ class Environment:
         reward = self.R.get( (self.state, state), 0 ) + self.R_bias
 
         # If there is no way to get out of this state, the episode has ended
-        episode_ended = len( self.Q[ state ] ) == 0
+        if self.end_set is not None:
+            episode_ended = state in self.end_set 
+        else:
+            episode_ended = len( self.Q[ state ] ) == 0
+
         if episode_ended:
             state = self._start()
         self.state = state
@@ -307,8 +312,8 @@ class OptionEnvironment( Environment ):
         # Get paths to node
         return options
    
-    def __init__( self, S, A, P, R, R_bias, O ):
-        Environment.__init__( self, S, A, P, R, R_bias )
+    def __init__( self, S, A, P, R, R_bias, start_set, end_set, O ):
+        Environment.__init__( self, S, A, P, R, R_bias, start_set, end_set )
         self.O = O
 
         # Update the Q function based on the options we now have

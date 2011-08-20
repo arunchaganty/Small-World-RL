@@ -180,8 +180,9 @@ class Taxi():
         start_set = range( 
                 state_idx( False, False, 1, 0, y, x ),
                 state_idx( False, False, 2, 3, y, x ) + 1 )
+        end_set = [ state_idx( True, True, 0, 0, 0, 0 ) ]
 
-        return S, A, P, R, R_bias, start_set
+        return S, A, P, R, R_bias, start_set, end_set
 
     @staticmethod
     def create( spec ):

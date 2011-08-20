@@ -15,7 +15,6 @@ class Rooms():
     """
 
     WALL        = 1
-    GOAL        = 2
 
     MOVE_UP     = 0
     MOVE_DOWN   = 1
@@ -64,19 +63,25 @@ class Rooms():
         if size != road_map.shape:
             raise ValueError()
 
-        goal = ()
-        for y in xrange( size[0] ):
-            for x in xrange( size[1] ):
-                if road_map[ y, x ] & Rooms.GOAL :
-                    goal = (y,x)
-                    break
-
-        return road_map, goal
+        return road_map
 
     @staticmethod
-    def make_mdp( road_map, goal ):
+    def get_random_goal( road_map ):
+        size = road_map.shape
+
+        loc = np.random.randint( 0, size[0] ), np.random.randint( 0, size[1] ) 
+        while road_map[ loc ] == Rooms.WALL:
+            loc = np.random.randint( 0, size[0] ), np.random.randint( 0, size[1] ) 
+
+        return loc
+
+
+    @staticmethod
+    def make_mdp( road_map ):
         size = road_map.shape
         state_idx = functools.partial( Rooms.state_idx, road_map )
+
+        goal = Rooms.get_random_goal( road_map )
 
         S = size[ 0 ] * size[ 1 ]
         A = 4 # up down left right
@@ -128,18 +133,15 @@ class Rooms():
                         ( state_idx( *down_state ), RESIDUE ),
                         ( state_idx( *left_state ), RESIDUE ),
                         ( state_idx( *right_state ), ACCURACY ), ]
-        # Remove actions from the goal state
-        s = state_idx( *goal )
-        for a in xrange( A ):
-            P[ a ][ s ] = []
-
         # Add rewards to all states that transit into the goal state
+        s = state_idx( *goal )
         for s_ in xrange( S ):
             R[ (s_,s) ] = Rooms.REWARD_SUCCESS - Rooms.REWARD_BIAS
         
         start_set = None
+        end_set = [ s ]
 
-        return S, A, P, R, R_bias, start_set
+        return S, A, P, R, R_bias, start_set, end_set
 
     @staticmethod
     def create( spec ):
@@ -147,6 +149,6 @@ class Rooms():
         if spec is None:
             road_map, starts = Rooms.make_map_from_size( 5, 5 )
         else:
-            road_map, goal = Rooms.make_map_from_file( spec )
-        return Environment( *Rooms.make_mdp( road_map, goal ) )
+            road_map = Rooms.make_map_from_file( spec )
+        return Environment( *Rooms.make_mdp( road_map ) )
 

@@ -48,7 +48,7 @@ class TaxiOptions( OptionEnvironment ):
         else:
             raise NotImplemented() 
 
-        return OptionEnvironment( env.S, env.A, env.P, env.R, env.R_bias, O )
+        return OptionEnvironment( env.S, env.A, env.P, env.R, env.R_bias, env.start_set, env.end_set, O )
 
 #    def __get_optimal_options( self ):
 #        # Reverse the graph to get the shortest paths to state

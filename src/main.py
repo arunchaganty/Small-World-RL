@@ -34,7 +34,7 @@ def main( iterations, ensembles, epochs, agent_type, agent_args, env_type, env_a
         runner = Runner( env )
 
         # Print a graph of the environment
-        # open( "graph-i%d.dot"%(i), "w" ).write( env.to_dot() )
+        # open( "%s-%d.dot"%(file_prefix, i), "w" ).write( env.to_dot() )
 
         ret_ = np.zeros( epochs, dtype=float )
         # Initialise environment and agent
