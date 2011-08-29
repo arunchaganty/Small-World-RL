@@ -21,6 +21,7 @@ tags
 *.mat
 *.dat
 output-*/
+data-*/
 
 # Temporary stuff
 attic/
