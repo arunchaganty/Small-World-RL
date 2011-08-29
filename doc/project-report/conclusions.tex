@@ -1,0 +1,26 @@
+\section{Conclusions and Future Work}
+\label{sec:conclusions}
+
+We have emperically shown that agents using options generating to make the
+state-space a `small world' converge reliably to near-optimal behaviour for a
+single domain. We clearly need to experiment on several other domains,
+especially larger ones.
+
+Our approach easily extends to stochastic domains, where the shortest path would
+naturally extend to the optimal policy between the two points. It would also be
+easy to find options based on a state space graph constructed from several
+trajectories, though such an approach leads to interesting questions about the
+dimensionality of the state space, and which value of $r$ that would need to be
+used.
+
+Another interesting direction to take this work forward would be to explore the
+dynamics of these options; would it be possible to merge or remove options
+dynamically? If so, it would imply this approach would scale very gracefully,
+and might make for a good cognitive model.
+
+% Small World options > random
+% Small World options good enough
+
+% Further experimentation
+% Dimensionality
+% Defining in stochastic domains
