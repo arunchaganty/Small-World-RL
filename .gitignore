@@ -11,6 +11,9 @@ tags
 *.log
 *.aux
 *.out
+*.nav
+*.toc
+*.snm
 *.pdf
 *.dvi
 *_tmp.tex

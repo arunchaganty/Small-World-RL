@@ -2,23 +2,28 @@
 \label{sec:intro}
 
 % Motivation
-Understanding how we are able to perform a diverse set of complex tasks has been
-a central question for the Artificial Intelligence community. We hypothesise
-that the key to this ability lies in finding a set of composable subtasks that
-``easily'' span the set of all tasks. Drawing parallels from Kleinberg's work on
-the small-world phenomenon in social networks \cite{Kleinberg}, we model our
+Understanding how we are able to perform a diverse set of complex
+tasks has been a central question for the Artificial Intelligence
+community. We hypothesise that the key to this ability lies in finding
+a set of composable subtasks that ``easily'' span the set of all
+tasks. Drawing parallels from Kleinberg's work on the small-world
+phenomenon in social networks \cite{Kleinberg}, we model our
 hypothesis using the options framework from reinforcement learning
-\cite{SuttonPrecupSingh1998}, and prove that given well-distributed subtasks, an
-agent can perform any task using only a logarithmic combination of subtasks and
-primitive actions. We support our hypothesis with experimental results.
+\cite{SuttonPrecupSingh1998}, and prove that given well-distributed
+subtasks, an agent can perform any task using only a logarithmic
+combination of subtasks and primitive actions. We support our
+hypothesis with experimental results.
 
 % General Introduction
-The options framework \cite{SuttonPrecupSingh1998} provides extended actions
-with predefined policies as an abstraction for subtasks. There has been
-substantial work in learning options, mainly focussed around identifying
-bottleneck states, either empirically as in \cite{Stolle}, or, more recently,
-using graph theoretic methods like betweenness centrality \cite{Simsek} or graph
-partitions \cite{Simsek2005}. Reaching bottlenecks alone is insufficient,
-especially when high value states do not lie on or near bottlenecks, as in
-arbitrary navigation tasks. Solutions to random subtasks are often are worse
-than not using any subtasks at all. What criteria then should we use when choosing subtasks?
+The options framework provides extended actions with predefined
+policies as an abstraction for subtasks. There has been substantial
+work in learning options, mainly focussed around identifying
+`bottlenecks', regions that the agent tends to visit frequently
+\cite{McGovern2001}, either empirically as in \cite{McGovern2001}, or,
+more recently, using graph theoretic methods like betweenness
+centrality \cite{Simsek} or graph partitions \cite{Menache}, with the
+intuition that they will help the agent move between strongly
+connected components, and thus help in effective exploration. This
+does not meet our criteria of composability (tasks solved as series of
+subtasks) and universality ({\em any} state should be efficiently
+reachable).

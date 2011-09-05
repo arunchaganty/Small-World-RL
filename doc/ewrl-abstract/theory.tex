@@ -2,30 +2,35 @@
 \label{sec:approach}
 
 % Explain small world
-To answer this question, we look at the analysis of the ``small world
-phenomenon'' in social networks by Kleinberg. Kleinberg defines the phenomenon
-to be exhibited when when individuals can {\em efficiently} transmit a message
-from source to destination knowing only the locations of their immediate
-acquaintances with a decentralised algorithm. 
-% Statement of Kleinberg's results
-Consider a $k$-dimensional lattice of $n$ people \footnote{ Kleinberg's proofs
-were limited to the $2$-dimensional case. Martel and Nyugen \cite{Martel2004}
-extended them to the $k$-dimensional case }, wherein each person is connected to
-one other person outside his/her immediate neighbours, according to the
-distribution $P_{r}( u, v ) \propto \dist(u,v)^{-r}$, where $\dist(u,v)$
-is the lattice distance between nodes $u$ and $v$, and $r$ is a parameter.
-Kleinberg proves (a) that when $r=0$, i.e. the extra connections are uniformly
-distributed, any decentralized algorithm will have an expected delivery time
-that is exponential in $\tilde{d}$ (the shortest path length between $u$ and
-$v$), and (b) when $r=k$, an algorithm can be constructed whose expected
-delivery time is only polynomial of small degree in $\tilde{d}$.
+As motivation, we look at the Kleinberg's analysis of the ``small
+world phenomenon'' in social networks, defined to be exhibited when
+individuals operating under a decentralised algorithm can transmit a
+message from source to destination using a {\em short} path using only
+local information such as the locations of their immediate
+acquaintances. 
 
-Similarly, we define an MDP with options to exhibit the small world property
-when an agent can efficiently reach a state of {\em maximal value} using only
-its' local information. Using a similarly constructed $k$-dimensional lattice
-for $\states$, where two states are connected by primitive actions if they are
-neighbours, and by an option with an optimal deterministic policy otherwise. By
-relating the distance of two states in the state space, and the difference in
-value of the two states, we are able to prove that the expected number of {\em
-decisions} an agent will have to make to reach a maximal value state will be poly-logarithmic in
-$|\states|$.
+% Statement of Kleinberg's results
+Consider a $k$-dimensional lattice of $n$ people \footnote{
+Kleinberg's proofs were limited to the $2$-dimensional case, but were
+extended to the $k$-dimensional case by Martel and Nyugen
+\cite{Martel2004} }, wherein each person is connected to one
+non-neighbour, according to the distribution $P_{r}( u, v )
+\propto \| u-v \|^{-r}$, where $\|u-v\|$ is the graph distance between
+nodes $u$ and $v$, and $r$ is a parameter. Kleinberg proves (a) that
+when $r=0$, i.e. extra connections are uniformly distributed, any
+decentralized algorithm will have an expected delivery time
+exponential in $\tilde{d}$ (the shortest path length between $u$ and
+$v$), and (b) when $r=k$, an algorithm can be constructed whose
+expected delivery time is only polynomial of small degree in
+$\tilde{d}$.
+
+Similarly, we define an MDP with options to exhibit the small world
+property when an agent can efficiently reach a state of {\em maximal
+value} using only its local information. We construct a set of
+`small-world options' which connect states in the state-interaction
+graph according to $P_r$. By relating distance of two
+states in the state space, and the difference in value of the two
+states, we are able to prove that for a particular exponent($r$), the
+expected number of {\em decisions} an agent will have to make to reach
+a globally maximal value state will be poly-logarithmic in
+$|\states|$. 
