@@ -23,6 +23,7 @@ tags
 *.png
 *.mat
 *.dat
+output/
 output-*/
 data-*/
 
