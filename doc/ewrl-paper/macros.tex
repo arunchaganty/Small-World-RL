@@ -1,0 +1,43 @@
+% Section References
+\newcommand{\secref}[1] {\hyperref[#1]{Section~\ref*{#1}}}
+\newcommand{\eqnref}[1] {Equation \eqref{#1}}
+\newcommand{\thmref}[1] {Theorem \ref{#1}}
+\newcommand{\lmref}[1] {Lemma \ref{#1}}
+\newcommand{\algoref}[1] {\hyperref[#1]{Algorithm~\ref*{#1}}}
+\renewcommand{\algorithmiccomment}[1]{\textit{// #1}}
+%\theoremstyle{plain} \newtheorem{thm}{Theorem}
+
+%Math Operators
+\DeclareMathOperator {\argmax} {argmax}
+\DeclareMathOperator {\sgn} {sgn}
+\DeclareMathOperator {\trace} {tr}
+\DeclareMathOperator{\E} {E}
+\DeclareMathOperator{\Var} {Var}
+
+\renewcommand{\Re} {\mathbb{R}}
+
+\newcommand{\ud}{\, \mathrm{d}}
+\newcommand{\diff}[1] {\frac{\partial}{\, \partial #1}}
+\newcommand{\diffn}[2] {\frac{\partial^{#2}}{\, \partial {#1}^{#2}}}
+\newcommand{\tuple}[1] {\langle #1 \rangle}
+
+%Short hand
+\newcommand{\states} {\mathcal{S}}
+\newcommand{\actions} {\mathcal{A}}
+\newcommand{\rewards} {\mathcal{R}}
+\newcommand{\graph} {\mathcal{G}}
+\newcommand{\policy} {\pi}
+\newcommand{\initset} {\mathcal{I}}
+\newcommand{\stopcond} {\beta}
+\newcommand{\option} {\tuple{ \initset,\policy,\stopcond} }
+\newcommand{\options} {\mathcal{O}}
+
+%Math Operators
+\DeclareMathOperator {\ball} {B}
+\DeclareMathOperator {\ballf} {B^{f}}
+\DeclareMathOperator {\sball} {b}
+\DeclareMathOperator {\sballf} {b^{f}}
+
+%Short hand
+\newcommand{\arbcnst} {\tilde{c}}
+\newcommand{\greedyalgo} {\ensuremath{\mathcal{GA}~}}

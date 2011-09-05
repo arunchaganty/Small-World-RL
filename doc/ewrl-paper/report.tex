@@ -1,0 +1,74 @@
+\documentclass[a4paper]{llncs}
+%\usepackage{fullpage}
+%\usepackage{palatino}
+
+\usepackage{makeidx}
+\usepackage{amsmath}   
+\usepackage{amsfonts}   
+\usepackage[retainorgcmds]{IEEEtrantools}
+\usepackage{thumbpdf}
+\usepackage{multicol}   
+\usepackage{graphicx}   
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{tikz}
+\usepackage{subfigure}
+
+\usepackage[
+  pagebackref,
+  pdfpagelabels,
+  extension=pdf,
+]{hyperref}
+\hypersetup{ 
+  pdftitle          = {Learning in a Small World},
+  pdfsubject        = {Learning in a Small World},
+  pdfauthor         = {Arun Tejasvi Chaganty, Prateek Gaur, Balaraman Ravindran},
+  pdfkeywords       = {},
+  pdfcreator        = {pdflatex},
+  pdfproducer       = {LaTeX with hyperref and thumbpdf},
+  pdfstartpage      = {1},
+  pdfpagemode       = UseThumbs,
+  colorlinks        = true,
+  linkcolor         = red,
+  anchorcolor       = red,
+  citecolor         = blue,
+  filecolor         = red,
+  urlcolor          = red
+}
+
+\input{macros}
+
+\title{Learning in a Small World}
+\author{ Arun Tejasvi Chaganty \and Prateek Gaur \and Balaraman Ravindran \inst{1} } 
+\institute{ Department of Computer Science and Engineering, \\
+            IIT Madras, Chennai, India - 600036 }
+
+
+\pagestyle{headings}  % switches on printing of running heads
+
+\frontmatter
+\mainmatter
+
+\begin{document}
+
+\maketitle
+%\pagebreak
+
+% Outline
+\input{abstract}
+\input{intro}
+\input{foundations}
+\input{theory}
+\input{conclusions}
+
+\bibliographystyle{alpha}
+\bibliography{ewrl}{}
+
+%\newpage
+%\appendix
+
+%\include{code}
+
+\end{document}
+

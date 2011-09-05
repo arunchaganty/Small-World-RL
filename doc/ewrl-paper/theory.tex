@@ -1,0 +1,121 @@
+\section{Theory}
+\label{sec:theory}
+
+% Introduction and motivation for the proof
+
+% Abstract result
+Consider a $k$-dimensional lattice $\graph(V,E)$ with random links distributed
+according to an inverse power law distribution $p(u,v) \propto \|u-v\|^{-k}$,
+where $\|u - v\|$ is the Manhattan distance between $u$ and $v$. Let us define
+$\ball_l(u)$ to be the set of nodes contained within a ``ball'' of radius $l$
+centered at $u$, i.e.  $\ball_l(u) = \{ v \mid \|u - v\| < l \}$, and
+$\sball_l(u)$ to be the set of nodes on its surface, i.e. $\sball_l(u) = \{ v
+\mid \|u - v\| = l \}$.
+
+\begin{lemma}
+    The inverse normalised coefficient $c_u = O( \log(n) )$, and $p(u,v) =
+    \|u - v\|^{-k} \Omega( \log(n)^{-1} )$.
+\end{lemma}
+\begin{proof}
+    \begin{IEEEeqnarray*}{rCl}
+        c_u &=& \sum_{v \ne u} \|u - v\|^{-k} \\
+            &=& \sum_{j=1}^{k(n-1)} \sball_j(u) j^{-k}.
+    \end{IEEEeqnarray*}
+    It can easily be shown that the $\sball_l(u) = \theta( l^{k-1} )$. Thus, the
+    $c_u$ reduces to a harmonic sum, and trivially, $c_u = \theta( \log(n) )$.
+    The second part of the lemma follows as $p(u,v) = \frac{ \|u - v\|^{-k} }{c_u}$. 
+    \\ \qed
+\end{proof}
+
+\begin{lemma}
+    \label{lm:link-to-ball}
+    For any $k \ge 1$, there exists a constant $\arbcnst$ such that for any ball
+    $\ball_l(v)$ and node $u$ outside $\ball_l(v)$ on $\graph$ such that,
+    $P(u,\sball_l(v)) \le \frac {\arbcnst}{m\log(n)}$, where $m = \min_{w \in
+    \sball_l(v)} \|u-w\|$, the minimum distance from the surface of the ball.
+    Further, if $k \ge 2$, and $l \le m$, then $P(u,\sball_l(v)) \le \frac
+    {\arbcnst l}{m^2\log(n)}$. 
+\end{lemma}
+\begin{proof}
+    Refer Fact 4 of \cite{Martel2004}.
+    \\ \qed
+\end{proof}
+
+Consider a function $f$ embedded on $\graph(V,E)$, i.e. $f : V \to \Re$, with
+the property that $\|f(u) - f(v)\| = \kappa\|u - v\| + c$, where $c \in [c_1,
+c_2]$. We analogously define $\ballf_l(u) = \{ v \mid \|f(u) - f(v)\| < l \}$. 
+
+\begin{lemma}
+    \label{lm:link-to-ballf}
+    For any $k \ge 1$, there exists a constant $c$ such that for any ball
+    $\ballf_l(v)$ and node $u$ outside $\ballf_l(v)$ on $\graph$ such that,
+    $P(u,\sballf_l(v)) \le \frac {\arbcnst}{m\log(n)}$, where $m = \min_{w \in
+    \sballf_l(v)} \|u-w\|$, the minimum distance from the surface of the ball.
+    Further, if $k \ge 2$, and $l \le m$, then $P(u,\sballf_l(v)) \le \frac
+    {\arbcnst(\kappa l+c_1)}{m^2\log(n)}$. 
+\end{lemma}
+\begin{proof}
+    Nodes in $\sballf_l(v)$ lie between $\ball_{\kappa l+c_1}(v)$ and
+    $\ball_{\kappa l+c_2}(v)$, thus, $P(u,\sball_f(v)) \le  P(u,\sball_{\kappa l+c_1}(v))$.
+    From \lmref{lm:link-to-ball}, when $k \ge 1$, $P(u,\sballf_l(v)) \le \frac
+    {\arbcnst}{m\log(n)}$, and when $k \ge 2$, $P(u,\sballf_l(v)) \le \frac
+    {\arbcnst(\kappa l+c_1)}{m^2\log(n)}$.
+    \\ \qed
+\end{proof}
+
+% Describe problem / algo
+
+Let $v$ be the global maxima of $f$, and $N(u)$ be the next node found by
+\greedyalgo from $u$. Let $\delta_v(u) = \|f(u)-f(v)\| - \|f(N(u))-f(v)\|$. The following lemma
+directly follows from \lmref{lm:link-to-ballf}.
+
+\begin{lemma}
+    \label{lm:rate}
+    For each $k \ge 1$, there exists a constant $\arbcnst$ such that, for
+    $\graph$, any two nodes $u$, $v$, and any integer $1 < m < \|f(u) - f(v)\|$,
+    $\Pr[ \delta_v(u) = m ] \le \frac{\arbcnst}{m \log(n)} \times \min \{ 1,
+    \frac{ \kappa\|f(u)-f(v)\| + c_1 - m }{m} \}$.
+\end{lemma}
+\begin{proof}
+    When $\delta_v(u) = m$,  $N(u)$ lies on $b = \sballf_{\|f(u)-f(v)\| -
+    m}(v)$, and thus, from \lmref{lm:link-to-ballf}, we have $P(u,b)$ to be
+    bounded by either, $\frac {\arbcnst}{m\log(n)}$ or $\frac {\arbcnst(\kappa\|u -
+    v\| + c_1 - m)}{m^2\log(n)}$.
+    \\ \qed
+\end{proof}
+
+
+\begin{theorem}
+    \label{thm:decisions}
+    \greedyalgo takes $O( \log^2(n) )$ decisions.
+\end{theorem}
+\begin{proof}
+    Let a node $u$ be in phase $j$ when $u \in \ballf_{2^{j+1}} \setminus
+    \ballf_{2^{j}}$. The probability that phase $j$ will end this step is equal
+    to the probability that $N(u) \in \ballf_{2^{j}}$. 
+    
+    The size of $\ballf_{2^{j}}$ is at least $|\ball_{\kappa 2^{j}+c_1}| = O(
+    (\kappa 2^{j}+c_1)^{k-1} )$. The probability of an edge between $u$ and a
+    node in $\ballf_{2^{j}}$ is at least $ (\kappa 2^{j+1}+c_2)^{-k}
+    \log(n)^{-1} $. Thus, 
+    \begin{IEEEeqnarray*}{rCl}
+        P(u, \ballf_{2^{j}} ) &\ge& (\kappa 2^{j}+c_1)^{k-1} \times (\kappa 2^{j+1}+c_2)^{-k} \theta( \log(n) )^{-1}  \\
+        &\ge& \frac{1}{2 \theta( \log(n) )} \times \frac{ (1 + \frac{c_1}{\kappa 2^{j}})^{k-1} }{ (1+\frac{c_2}{2\kappa 2^{j}})^{k} }.\\
+    \end{IEEEeqnarray*}
+    As $c_2 > 2 c_1$, 
+    \begin{IEEEeqnarray*}{rCl}
+        P(u, \ballf_{2^{j}} ) &\ge& \frac{1}{2 \theta( \log(n) )} \times (1 + \frac{c_1}{\kappa 2^{j}})^{-1} (\frac{1 + \frac{c_1}{\kappa}}{1+\frac{c_2}{2\kappa}})^{k} \\
+        P(u, \ballf_{2^{j}} ) &\ge& \frac{1}{2 \theta( \log(n) ) (1 + \frac{c_1}{\kappa}) } (\frac{1 + \frac{c_1}{\kappa}}{1+\frac{c_2}{2\kappa}})^{k}.\\
+    \end{IEEEeqnarray*}
+
+    Let number of decisions required to leave phase $j$ be $X_j$. Then,
+    \begin{IEEEeqnarray*}{rCl}
+        \E[X_j] &\le& \sum_{i=0}^{\infty} (1 - P(u, \ballf_{2^{j}} ))^i \\
+                &\le& \frac{1}{P(u, \ballf_{2^{j}} )} \\
+                &\le& 2 \theta( \log(n) ) (1 + \frac{c_1}{\kappa}) (\frac{1 + \frac{c_2}{2\kappa}}{1+\frac{c_1}{\kappa}})^{k} \\
+                &\le& \theta( \log(n) ).
+    \end{IEEEeqnarray*}
+    Thus, $\E[X_j]$ is $O(\log(n))$. By construction, there are at most $\log(n)$
+    phases, and thus at most $O(\log^2(n))$ decisions.
+    \\ \qed
+\end{proof}
