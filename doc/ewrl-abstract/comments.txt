@@ -1,0 +1,21 @@
+*1) Balaraman Ravindran, you have it flipped around.
+
+*2) McGovern, Barto is more of a standard reference on Bottleneck states.
+
+*3) Graph partitioning based methods, if you had to include one reference, I would suggest Shie Mannor's work.
+
+-4) Ozgur looks at her betweenness work as also having been inspired by SNA. :)
+
+-5) Kleinberg talks about distributed navigation property. Does he mention that the ability to navigate the network is what constitutes "small-world"-ness? 
+
+*6) I don't understand Fig 1(b). Is that cumulative return? If so, either you have to mention that explicitly. or redraw it so that it is instantaneous (i.e., only the current epoch) return. The latter is the usual convention when not analyzing regret. :). Any RL person looking at this graph is going to assume that the methods initially unlearn and then start learning. :). 
+
+?7) Another issue with the graph. Does this imply that even on the rooms world task, betweenness does worse than "no options". Any explanation for that?  Does this have arbitrary goal states anywhere in the rooms and not just at the doorways? Even then Doina showed that having good options (i.e., doorways) beats primitive actions. Does that imply that the betweenness method doesn't find the doorways? 
+
+* 8) "Reaching bottlenecks alone is insufficient, especially when high value states do not lie on or near bottlenecks, as in arbitrary navigation tasks."  Now that is a little tricky. What is your definition of a bottle neck? Also, how do bottleneck detection methods operate? For e.g., in McGovern's work, she only looks at bottleneck states on successful trajectories, that are not there in unsuccessful ones. But this limits the usefulness of the option only to those tasks from which the options were derived. So a sentence or two on how we interpret bottlenecks and usefulness might be in order here. 
+
+?9) I ask for my own intuition. What determines the dimension of the lattice? The max. no. of neighbors that a node has? Have you looked at the playroom domain? From the IMRL paper (Satinder, Barto, Chatnanez(?)). What would be dimension of the lattice there? How about the game world that Pradyot uses for his experiments? How about the C-space of a robot arm? If it is a 5-DoF robot, would it be a 5-d lattice?  
+
+*10) State of maximal value: Is that locally maximal or globally maximal? In the true optimal value fn. or the current value fn. estimate? I know the answer, since I asked you. Maybe a line to that effect in the paper? 
+
+11) The document is very well written. I would be hard pressed to leave out anything, if you ask me. :). So fitting in the rest might be a problem. One possibility is to get rid of some of the white space below the title, etc. Also, given the relaxed nature of the reviewing, etc., I am sure they will not mind a little over run, like you have now. :).

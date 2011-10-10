@@ -16,7 +16,7 @@ tags
 *.snm
 *.pdf
 *.dvi
-*_tmp.tex
+*_tmp.*
 
 # Data
 *.dot
