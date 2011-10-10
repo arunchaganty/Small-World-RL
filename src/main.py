@@ -35,8 +35,9 @@ def main( iterations, ensembles, epochs, agent_type, agent_args, env_type, env_a
     min_, max_ = inf * np.ones( epochs, dtype=float) , -inf * np.ones( epochs, dtype=float)
     decision_table = {}
     var = np.zeros( epochs, dtype=float )
+    env = Runner.load_env( env_type, env_args )
     for i in xrange( 1, iterations+1 ):
-        env = Runner.load_env( env_type, env_args )
+        env = Runner.reload_env( env, env_type, env_args )
         runner = Runner( env )
 
         # Print a graph of the environment

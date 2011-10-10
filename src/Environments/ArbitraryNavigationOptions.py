@@ -9,7 +9,7 @@ import pdb
 from Environment import *
 from ArbitraryNavigation import ArbitraryNavigation
 
-class ArbitraryNavigationOptions( OptionEnvironment ):
+class ArbitraryNavigationOptions( ):
 
     @staticmethod
     def create( height, width, scheme = 'none', count = 20, *args ):
@@ -48,5 +48,11 @@ class ArbitraryNavigationOptions( OptionEnvironment ):
         else:
             raise NotImplemented() 
 
+        return OptionEnvironment( env.S, env.A, env.P, env.R, env.R_bias, env.start_set, env.end_set, O )
+
+    @staticmethod
+    def reset_rewards( env, road_map ):
+        O = env.O
+        env = ArbitraryNavigation.reset_rewards( env, road_map )
         return OptionEnvironment( env.S, env.A, env.P, env.R, env.R_bias, env.start_set, env.end_set, O )
 

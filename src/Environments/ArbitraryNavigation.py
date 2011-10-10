@@ -121,3 +121,21 @@ class ArbitraryNavigation():
         """Create a place from @spec"""
         return Environment( *ArbitraryNavigation.make_mdp( (height, width) ) )
 
+    @staticmethod
+    def reset_rewards( env, height, width ):
+        size = (height, width)
+        state_idx = functools.partial( ArbitraryNavigation.state_idx, size )
+        goal = ArbitraryNavigation.get_random_goal( size )
+
+        # Reset the rewards
+        R = {}
+        # Add rewards to all states that transit into the goal state
+        s = state_idx( *goal )
+        for s_ in xrange( S ):
+            R[ (s_,s) ] = ArbitraryNavigation.REWARD_SUCCESS - ArbitraryNavigation.REWARD_BIAS
+        
+        start_set = None
+        end_set = [ s ]
+
+        return Environment( env.S, env.A, env.P, R, env.R_bias, start_set, end_set )
+

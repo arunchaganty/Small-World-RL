@@ -25,8 +25,22 @@ class Runner:
         """Try to construct an environment"""
         mod = __import__("Environments.%s"%(env_type), fromlist=[Environments])
         assert( hasattr(mod, env_type) )
-        env = getattr( mod, env_type )
-        env = env.create( *env_args )
+        envClass = getattr( mod, env_type )
+        env = envClass.create( *env_args )
+        # except (ImportError, AssertionError):
+        #     raise ValueError("Environment '%s' could not be found"%(env_type))
+        # except (TypeError):
+        #     raise ValueError("Environment '%s' could not be initialised\n%s"%(env_type, env.create.__doc__))
+
+        return env
+
+    @staticmethod
+    def reload_env( env, env_type, env_args ):
+        """Try to construct an environment"""
+        mod = __import__("Environments.%s"%(env_type), fromlist=[Environments])
+        assert( hasattr(mod, env_type) )
+        envClass = getattr( mod, env_type )
+        env = envClass.reset_rewards( env, *env_args )
         # except (ImportError, AssertionError):
         #     raise ValueError("Environment '%s' could not be found"%(env_type))
         # except (TypeError):
@@ -40,8 +54,8 @@ class Runner:
 
         mod = __import__("Agents.%s"%(agent_type), fromlist=[Agents])
         assert( hasattr(mod, agent_type) )
-        agent = getattr( mod, agent_type )
-        agent = agent( env.Q, *agent_args )
+        agentClass = getattr( mod, agent_type )
+        agent = agentClass( env.Q, *agent_args )
         # except (ImportError, AssertionError):
         #     raise ValueError("Agent '%s' could not be found"%(agent_type))
         # except (TypeError):

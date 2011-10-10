@@ -28,6 +28,7 @@ class Rooms():
     REWARD_SUCCESS = 50 - REWARD_BIAS
     REWARD_CHECKPOINT = 0 # - REWARD_BIAS
 
+
     @staticmethod
     def state_idx( road_map, y, x ):
         """Compute the index of the state"""
@@ -147,8 +148,29 @@ class Rooms():
     def create( spec ):
         """Create a room from @spec"""
         if spec is None:
-            road_map, starts = Rooms.make_map_from_size( 5, 5 )
+            raise NotImplemented
         else:
             road_map = Rooms.make_map_from_file( spec )
         return Environment( *Rooms.make_mdp( road_map ) )
 
+    @staticmethod
+    def reset_rewards( env, spec ):
+        if spec is None:
+            raise NotImplemented
+        else:
+            road_map = Rooms.make_map_from_file( spec )
+
+        goal = Rooms.get_random_goal( road_map )
+        state_idx = functools.partial( Rooms.state_idx, road_map )
+
+        # Reset the rewards
+        R = {}
+        # Add rewards to all states that transit into the goal state
+        s = state_idx( *goal )
+        for s_ in xrange( env.S ):
+            R[ (s_,s) ] = Rooms.REWARD_SUCCESS - Rooms.REWARD_BIAS
+        
+        start_set = None
+        end_set = [ s ]
+
+        return Environment( env.S, env.A, env.P, R, env.R_bias, start_set, end_set )

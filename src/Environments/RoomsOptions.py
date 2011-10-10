@@ -9,7 +9,7 @@ import pdb
 from Environment import *
 from Rooms import Rooms
 
-class RoomsOptions( OptionEnvironment ):
+class RoomsOptions( ):
 
     @staticmethod
     def create( spec, scheme = 'none', count = 20, *args ):
@@ -50,67 +50,9 @@ class RoomsOptions( OptionEnvironment ):
 
         return OptionEnvironment( env.S, env.A, env.P, env.R, env.R_bias, env.start_set, env.end_set, O )
 
-#    def __get_optimal_options( self ):
-#        # Reverse the graph to get the shortest paths to state
-#        # there is something natural options that sir was talking about
-#        # here, I do not remember it well, but it was do the 
-#        # options that are returned resemeble the actions that
-#        # the agent can take in real world, and not some shady
-#        # actions which we derive just based on the interaction 
-#        # graph
-#        # that is the sequence which these options represent can 
-#        # actually be performed in real world
-#        gr = self.graph.reverse()
-#        options = []
-#        
-#        in_taxi = len( self.starts )
-#        road_size = len( self.road_map )
-#        for dest_i in xrange( len( self.starts ) ):
-#            # Paths to the passenger
-#            for start_i in xrange( len( self.starts ) ):
-#                if start_i == dest_i: 
-#                    continue
-#                st = self.get_state( start_i, dest_i, *self.starts[ start_i ] )
-#                paths = nx.shortest_path( gr, source=st )
-#                options.append( self.__make_option_from_paths( st, paths ) )
-#            # Paths to the destination
-#            grs = gr.subgraph( range( 
-#                self.get_state( in_taxi, dest_i, 0, 0 ),
-#                self.get_state( in_taxi, dest_i, road_size-1, road_size-1 ) + 1 ) )
-#            st = self.get_state( in_taxi, dest_i, *self.starts[ dest_i ] )
-#            paths = nx.shortest_path( grs, source=st )
-#            options.append( self.__make_option_from_paths( st, paths ) )
-#
-#        return options
-#
-#    def __get_manual_options( self ):
-#        """Use manually-defined options"""
-#        # Reverse the graph to get the shortest paths to state
-#        gr = self.graph.reverse()
-#        options = []
-#        
-#        in_taxi = len( self.starts )
-#        road_size = len( self.road_map )
-#        for dest_i in xrange( len( self.starts ) ):
-#            # Paths to the passenger
-#            for start_i in xrange( len( self.starts ) ):
-#                if start_i == dest_i: 
-#                    continue
-#                for start_j in xrange( len( self.starts ) ):
-#                    if start_j == dest_i: 
-#                        continue
-#                    # Paths to some pad
-#                    st = self.get_state( start_i, dest_i, *self.starts[ start_j ] )
-#                    paths = nx.shortest_path( gr, source=st )
-#                    options.append( self.__make_option_from_paths( st, paths ) )
-#            # Paths to the destination
-#            grs = gr.subgraph( range( 
-#                self.get_state( in_taxi, dest_i, 0, 0 ),
-#                self.get_state( in_taxi, dest_i, road_size, road_size-1 ) ) )
-#            for dest_j in xrange( len( self.starts ) ):
-#                st = self.get_state( in_taxi, dest_i, *self.starts[ dest_j ] )
-#                paths = nx.shortest_path( grs, source=st )
-#                options.append( self.__make_option_from_paths( st, paths ) )
-#
-#        return options
+    @staticmethod
+    def reset_rewards( env, spec, *args ):
+        O = env.O
+        env = Rooms.reset_rewards( env, spec )
+        return OptionEnvironment( env.S, env.A, env.P, env.R, env.R_bias, env.start_set, env.end_set, O )
 

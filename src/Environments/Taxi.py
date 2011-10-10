@@ -193,3 +193,7 @@ class Taxi():
             road_map, starts = Taxi.make_map_from_file( spec )
         return Environment( *Taxi.make_mdp( road_map, starts ) )
 
+    @staticmethod
+    def reset_rewards( env, *args ):
+        return env
+
