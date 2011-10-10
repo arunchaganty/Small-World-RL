@@ -1,0 +1,41 @@
+Understanding how we are able to perform a diverse set of complex
+tasks has been a central question for the Artificial Intelligence
+community. We hypothesise that the key to this ability lies in finding
+a set of composable subtasks that "easily" span the set of all tasks.
+Drawing parallels from Kleinberg's work on the small-world phenomenon
+in social networks, we model our hypothesis using the options
+framework from reinforcement learning, and prove that given
+well-distributed subtasks, an agent can perform any task using only a
+logarithmic combination of subtasks and primitive actions. We support
+our hypothesis with experimental results.
+
+The options framework provides extended actions with predefined
+policies as an abstraction for subtasks. There has been substantial
+work in learning options, mainly focussed around identifying
+'bottlenecks', regions that the agent tends to visit frequently,
+either empirically, or, more recently, using graph theoretic methods
+like betweenness centrality or graph partitions, with the intuition
+that they will help the agent move between strongly connected
+components, and thus help in effective exploration.  This does not
+meet our criteria of composability (tasks solved as series of
+subtasks) and universality (any state should be efficiently
+reachable).
+
+As motivation, we look at the Kleinberg's analysis of the "small world
+phenomenon" in social networks, defined to be exhibited when
+individuals operating under a decentralised algorithm can transmit a
+message from source to destination using a short path using only local
+information such as the locations of their immediate acquaintances.
+Kleinberg showed that in a lattice with additional edges distributed
+according to the inverse power law, an agent could indeed do so in
+time logarithmic in the size of the network.
+
+Similarly, we define an MDP with options to exhibit the small world
+property when an agent can efficiently reach a state of maximal value
+using only its local information. We construct a set of 'small-world
+options' which connect states in the state-interaction graph according
+to the inverse square law. By relating distance of two states in the
+state space, and the difference in value of the two states, we are
+able to prove that for a particular exponent(r), the expected number
+of decisions an agent will have to make to reach a globally maximal
+value state will be logarithmic in |S|. 

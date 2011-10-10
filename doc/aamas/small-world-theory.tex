@@ -1,0 +1,99 @@
+\section{Small Worlds}
+\label{sec:small-worlds}
+
+% Introduction and motivation for the proof
+In this section, we will prove that the number of decisions taken by
+an $\epsilon$-greedy agent, $\egreedyalgo$, to reach a maximal value
+state in a $k$-dimensional lattice $\graph_k(V,E)$ is $O( (\log
+V)^2)$. This is a simple extension to the Kleinberg's result. Our
+approach is similar to that of Kleinberg's \cite{Kleinberg}, though we
+adopt the somewhat cleaner notation of \cite{Martel2004}.
+
+% Abstract result
+Consider a $k$-dimensional lattice $\graph_k(V,E)$ with random links distributed
+according to an inverse power law distribution $p(u,v) \propto \|u-v\|^{-k}$,
+where $\|u - v\|$ is the distance between $u$ and $v$ in $\graph$. 
+
+\begin{definition}
+Let us define $\ball_l(u)$ to be the set of nodes contained within a
+``ball'' of radius $l$ centered at $u$, i.e.  $\ball_l(u) = \{ v \mid
+\|u - v\| < l \}$, and $\sball_l(u)$ to be the set of nodes on its
+surface, i.e. $\sball_l(u) = \{ v \mid \|u - v\| = l \}$.
+\end{definition}
+
+We begin by finding the normalisation constant for the probability
+distribution $p(u,v)$.
+
+\begin{lemma}
+    The inverse normalised coefficient for $p(u,v)$ is $c_u = \theta(
+    \log n )$, and $p(u,v) = \|u - v\|^{-k} \theta( (\log n)^{-1} )$.
+\end{lemma}
+\begin{proof}
+    \begin{IEEEeqnarray*}{rCl}
+        c_u &=& \sum_{v \ne u} \|u - v\|^{-k} \\
+            &=& \sum_{j=1}^{k(n-1)} \sball_j(u) j^{-k}.
+    \end{IEEEeqnarray*}
+    It can easily be shown that the $\sball_l(u) = \theta( l^{k-1} )$.
+    Thus, the $c_u$ reduces to a harmonic sum, and hence, $c_u =
+    \theta( \log n )$.  The second part of the lemma follows as
+    $p(u,v) = \frac{ \|u - v\|^{-k} }{c_u}$. 
+    \\ \qed
+\end{proof}
+
+Now, consider a function $f$ embedded on $\graph(V,E)$, i.e. $f : V
+\to \Re$, with the property that $\kappa_1 \|u-v\| - c_1 \le \|f(u) -
+f(v)\| \le \kappa_2 \|u - v\| - c_2$, where $0 \le \kappa_1 \le
+\kappa_2$, and $0 \le c_2 \le \frac{c_1}{2}$. Equivalently,
+$\frac{\|f(u)-f(v)\| + c_2}{\kappa_2} \le \|u - v\| \le
+\frac{\|f(u)-f(v)\| + c_1}{\kappa_1}$. We analogously define
+$\ballf_l(u) = \{ v \mid \|f(u) - f(v)\| < l \}$. Let $M_f$ be the
+global maxima of $f$. For notational convenience, we take $\ballf_l$
+to be $\ballf_l(M_f)$.
+
+% Describe problem / algo
+\begin{definition}
+    Let $\egreedyalgo$ be an $\epsilon$-greedy algorithm. If $N(u)$ is
+    the next node chosen by $\egreedyalgo$, then $\egreedyalgo$
+    chooses with probability $1-\epsilon$, the edge $(u,v)$ such that
+    the distance of $v$ from the global maxima is minimum, i.e. $N(u)
+    = \argmin_v \|v - f(M_f)\|$.
+\end{definition}
+
+We are now ready to prove the following general result.
+
+\begin{theorem}
+    \label{thm:decisions}
+    \egreedyalgo takes $O( (\log n)^2 )$ decisions.
+\end{theorem}
+\begin{proof}
+    Let a node $u$ be in phase $j$ when $u \in \ballf_{2^{j+1}}
+    \setminus \ballf_{2^{j}}$. The probability that phase $j$
+    will end this step is equal to the probability that $N(u) \in
+    \ballf_{2^{j}}$. 
+    
+    The size of $\ballf_{2^{j}}$ is at least $|\ball_{\kappa_2^{-1}(
+    2^{j}+c_2)}| = \theta( \kappa_2^{-k} (2^{j}+c_2)^{k} )$. The
+    distance between $u$ and a node in $\ballf_{2^{j}}$ is at most
+    $\frac{2^{j+1} + c_1}{ \kappa_1 } + \frac{2^{j} + c_2}{\kappa_2} <
+    2(\frac{2^{j+1} + c_2}{\kappa_2})$. The probability of a link
+    between these two nodes is at least $\kappa_1^{-k} (2^{j+2} + 2
+    c_1)^{-k} \theta(\log n)^{-1} $. Thus, 
+
+    \begin{IEEEeqnarray*}{rCl}
+        P(u, \ballf_{2^{j}} ) &\ge& (1-\epsilon) (\frac{2^{j}+c_2}{\kappa_2})^{k} \times (\frac{2^{j+2} + 2 c_1}{\kappa_1})^{-k} \theta( \log n )^{-1}  \\
+        &\ge& \frac{(1-\epsilon)}{\theta( \log n )} \times (\frac{\kappa_1}{4\kappa_2} )^{k} \times ( \frac{ 1 + \frac{c_2}{2^{j}} }{ 1 + \frac{c_1}{2 \times 2^{j}} })^{k}\\
+        &\ge& \frac{(1-\epsilon)}{\theta( \log n )} \times (\frac{\kappa_1}{4\kappa_2} )^{k} \times ( \frac{ 1 + c_2 }{ 1 + \frac{c_1}{2} })^{k} .\\
+    \end{IEEEeqnarray*}
+
+    Let number of decisions required to leave phase $j$ be $X_j$. Then, 
+    \begin{IEEEeqnarray*}{rCl}
+        \E[X_j] &\le& \sum_{i=0}^{\infty} (1 - P(u, \ballf_{2^{j}} ))^i \\
+                &\le& \frac{1}{P(u, \ballf_{2^{j}} )} \\
+                &\le& \theta( \log n ) \frac{1}{(1-\epsilon)} (\frac{4 \kappa_2}{\kappa_1})^{k} ( \frac{ 1 + \frac{c_1}{2} }{ 1 + c_2 })^{k}\\
+                &\le& \theta( \log n ).
+    \end{IEEEeqnarray*}
+    Thus, $\E[X_j]$ is $O(\log n)$. By construction, there are at most $\log n$
+    phases, and thus at most $O((\log n)^2)$ decisions.
+    \\ \qed
+\end{proof}
+
