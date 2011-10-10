@@ -1,5 +1,6 @@
 % Section References
 \newcommand{\secref}[1] {\hyperref[#1]{Section~\ref*{#1}}}
+\newcommand{\appendixref}[1] {\hyperref[#1]{Appendix~\ref*{#1}}}
 \newcommand{\eqnref}[1] {Equation \eqref{#1}}
 \newcommand{\thmref}[1] {Theorem \ref{#1}}
 \newcommand{\lmref}[1] {Lemma \ref{#1}}
@@ -9,6 +10,7 @@
 
 %Math Operators
 \DeclareMathOperator {\argmax} {argmax}
+\DeclareMathOperator {\argmin} {argmin}
 \DeclareMathOperator {\sgn} {sgn}
 \DeclareMathOperator {\trace} {tr}
 \DeclareMathOperator{\E} {E}
@@ -26,11 +28,18 @@
 \newcommand{\actions} {\mathcal{A}}
 \newcommand{\rewards} {\mathcal{R}}
 \newcommand{\graph} {\mathcal{G}}
+\newcommand{\mdp} {\mathcal{M}}
 \newcommand{\policy} {\pi}
 \newcommand{\initset} {\mathcal{I}}
 \newcommand{\stopcond} {\beta}
 \newcommand{\option} {\tuple{ \initset,\policy,\stopcond} }
 \newcommand{\options} {\mathcal{O}}
+
+%Math Operators
+\DeclareMathOperator {\Qf} {Q}
+\DeclareMathOperator {\Vf} {V}
+\newcommand{\epsilonm} {\bar{\epsilon}}
+
 
 %Math Operators
 \DeclareMathOperator {\ball} {B}
@@ -41,3 +50,4 @@
 %Short hand
 \newcommand{\arbcnst} {\tilde{c}}
 \newcommand{\greedyalgo} {\ensuremath{\mathcal{GA}~}}
+\newcommand{\egreedyalgo} {\ensuremath{\mathcal{GA}_{\epsilon}~}}

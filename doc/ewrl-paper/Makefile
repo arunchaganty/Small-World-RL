@@ -6,7 +6,8 @@ FILE = report
 OUTPUT = $(shell basename $(PWD))
 FIGURES =
 SECTIONS = macros.tex abstract.tex intro.tex theory.tex experiments.tex conclusions.tex\
-		   taxi.tex
+		   taxi.tex small-world-theory.tex
+
 
 all: $(OUTPUT).pdf
 

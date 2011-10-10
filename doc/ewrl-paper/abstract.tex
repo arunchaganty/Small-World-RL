@@ -1,13 +1,16 @@
 \begin{abstract}
 
-Understanding how we are able to perform such a diverse set of complex tasks has
-been a central question for the Artificial Intelligence community. We
-hypothesise that the key to solving such tasks lies more in finding a set of
-sub-tasks that can easily span the set of all possible tasks, rather than
-finding the best sub-tasks for the goal. We model this hypothesis using the
-framework of reinforcement learning, and define the sub-tasks based on
-Kleinberg's small world model. Our preliminary results suggest that this
-hypothesis may indeed be valid. Further experimentation needs to be done to say
-so more confidently.
+Understanding how we are able to perform a diverse set of complex
+tasks has been a central question for the Artificial Intelligence
+community. We hypothesise that the key to this ability lies in finding
+a set of composable subtasks that ``easily'' span the set of all
+tasks. Drawing parallels from Kleinberg's work on the small-world
+phenomenon in social networks \cite{Kleinberg}, we model our
+hypothesis using the options framework from reinforcement learning
+\cite{SuttonPrecupSingh1998}, and prove that given well-distributed
+subtasks, an agent can perform any task using only a logarithmic
+combination of subtasks and primitive actions. Experimental results
+show that these subtasks outperform other popular subtask generation
+schemes on standard domains.
 
 \end{abstract}
