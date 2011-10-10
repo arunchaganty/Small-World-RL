@@ -11,6 +11,7 @@ import numpy as np
 from Agent import *
 from Environment import *
 from Runner import Runner
+from ProgressBar import ProgressBar
 
 def main( iterations, ensembles, epochs, agent_type, agent_args, env_type, env_args, file_prefix ):
     """RL Testbed.
@@ -23,6 +24,11 @@ def main( iterations, ensembles, epochs, agent_type, agent_args, env_type, env_a
     @arg env_args: Arguments to the environment constructor
     """
     # Load agent and environment
+
+    progress = ProgressBar( 0, ensembles*iterations, mode='fixed' )
+    # Needed to prevent glitches
+    print progress, "\r",
+    oldprog = str(progress)
 
     ret = np.zeros( epochs, dtype=float )
     inf = 1e+999 # Hack for infinity
@@ -51,6 +57,13 @@ def main( iterations, ensembles, epochs, agent_type, agent_args, env_type, env_a
                 decisions_, count_ = decision_table.get( episode_epochs, (0.0,0) )
                 decision_table[ episode_epochs ] = decisions + decisions_, count + count_
 
+            # print progress
+            progress.increment_amount()
+            if oldprog != str(progress):
+                print progress, "\r",
+                sys.stdout.flush()
+                oldprog=str(progress)
+
         ret += (ret_ - ret) / i
         min_ = np.min( np.vstack( ( min_, ret_ ) ), axis=0 )
         max_ = np.max( np.vstack( ( max_, ret_ ) ), axis=0 )
@@ -59,6 +72,7 @@ def main( iterations, ensembles, epochs, agent_type, agent_args, env_type, env_a
         var += (var_ - var) / i
 
     var = np.sqrt( var - np.power( ret, 2 ) )
+    print "\n"
 
     f = open("%s-return.dat"%( file_prefix ), "w")
     # Print ret
