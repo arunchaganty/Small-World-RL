@@ -18,6 +18,5 @@ for n in 100 200; do
         echo "Running $scheme(r=$r) with $n options..."
         PYTHONOPTIMIZE=3 python2 ./main.py $ITERS $ENSEMBLES $EPOCHS "MacroQ" "RoomsOptions:../domains/rooms-complex/rooms$cmplx.txt:$scheme:$n:$r" $tmp_prefix
         mv "$tmp_prefix-return.dat" $DD/$cmplx-$n-$r.return
-        mv "$tmp_prefix-decisions.dat" $DD/$cmplx-$n-$r.decisions
     done;
 done;

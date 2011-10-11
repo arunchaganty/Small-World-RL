@@ -27,14 +27,13 @@ def main( iterations, ensembles, epochs, agent_type, agent_args, env_type, env_a
 
     progress = ProgressBar( 0, ensembles*iterations, mode='fixed' )
     # Needed to prevent glitches
-    print progress, "\r",
     oldprog = str(progress)
 
+    # Counters
     ret = np.zeros( epochs, dtype=float )
-    inf = 1e+999 # Hack for infinity
-    min_, max_ = inf * np.ones( epochs, dtype=float) , -inf * np.ones( epochs, dtype=float)
-    decision_table = {}
+    min_, max_ = np.inf * np.ones( epochs, dtype=float) , -np.inf * np.ones( epochs, dtype=float)
     var = np.zeros( epochs, dtype=float )
+
     env = env_type.create( *env_args )
     for i in xrange( 1, iterations+1 ):
         env = env_type.reset_rewards( env, *env_args )
@@ -43,16 +42,10 @@ def main( iterations, ensembles, epochs, agent_type, agent_args, env_type, env_a
         # Initialise environment and agent
         for j in xrange( 1, ensembles+1 ):
             agent = agent_type( env.Q, *agent_args )
-            ret__, decision_table_ = Runner.run( env, agent, epochs )
+            ret__ = Runner.run( env, agent, epochs )
             ret__ = np.cumsum( ret__ )
-
             # Add to ret_
             ret_ += (ret__ - ret_) / j
-
-            # Update decision counters
-            for episode_epochs, (decisions, count) in decision_table_.items():
-                decisions_, count_ = decision_table.get( episode_epochs, (0.0,0) )
-                decision_table[ episode_epochs ] = decisions + decisions_, count + count_
 
             # print progress
             progress.increment_amount()
@@ -67,25 +60,15 @@ def main( iterations, ensembles, epochs, agent_type, agent_args, env_type, env_a
 
         var_ = np.power( ret_, 2 )
         var += (var_ - var) / i
+    print "\n"
 
     var = np.sqrt( var - np.power( ret, 2 ) )
-    print "\n"
 
     f = open("%s-return.dat"%( file_prefix ), "w")
     # Print ret
     for i in xrange( len( ret ) ):
         f.write( "%d %f %f %f %f\n"%( i+1, ret[ i ], min_[i], max_[i], var[ i ] ) )
     f.close()
-
-    decisions = [ ( episode_epochs, float(decisions)/count ) for episode_epochs, (decisions, count) in decision_table.items() ]
-    decisions.sort( key = lambda (k,v): k )
-
-    f = open( "%s-decisions.dat"%( file_prefix ), "w" )
-    for episode_epochs, decisions in decisions:
-        f.write( "%d %f\n"%( episode_epochs, decisions ) )
-    f.close()
-
-    # Dump the policy learnt?
 
 def print_help(args):
     """Print help"""
