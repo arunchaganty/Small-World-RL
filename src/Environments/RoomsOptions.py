@@ -25,6 +25,11 @@ class RoomsOptions( ):
         g = env.to_graph()
         gr = g.reverse()
 
+        # Percentage
+        if isinstance(count,str):
+            count = int(count[:-1])
+            count = count*env.S/100
+
         # Add options for all the optimal states
         O = []
         if scheme == "none":
