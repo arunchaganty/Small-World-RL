@@ -10,12 +10,24 @@ import random
 from Environment import *
 
 class Agent:
-    Q = {}
+    Q = []
     def __init__(self, Q):
         self.Q = Q
 
     def act( self, state, reward, episode_ended ):
         raise NotImplemented()
+
+    def greedy_policy( self ):
+        S = len( self.Q )
+
+        pi = {}
+        for s in xrange( S ):
+            # Choose greedy action
+            actions = self.Q[ s ]
+            max_value = max( ( pr for (a,pr) in actions ) )
+            a = random.choice( tuple( a for (a,pr) in actions if pr == max_value ) )
+            pi[s] = a
+        return pi
 
 class ValueAgent( Agent ):
     old_state = None
