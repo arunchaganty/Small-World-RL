@@ -236,7 +236,7 @@ class OptionEnvironment( Environment ):
 
         options = []
         for n in nodes:
-            options.append( OptionEnvironment.make_point_option( g, gr, n ) )
+            options.append( OptionEnvironment.make_point_option( g, gr, n, 16 ) )
 
         
             # print progress
@@ -274,7 +274,7 @@ class OptionEnvironment( Environment ):
 
         options = []
         for n in local_maximas:
-            options.append( OptionEnvironment.make_point_option( g, gr, n ) )
+            options.append( OptionEnvironment.make_point_option( g, gr, n, 16 ) )
 
         
             # print progress
