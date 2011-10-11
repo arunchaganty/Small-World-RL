@@ -1,6 +1,6 @@
-ITERS=10
-ENSEMBLES=20
-EPOCHS=40000
+ITERS=2
+ENSEMBLES=2
+EPOCHS=400
 
 DD="rooms-complex"
 tmp_prefix="rc1"

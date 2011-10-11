@@ -7,6 +7,7 @@ import networkx as nx
 import pdb
 
 from Environment import *
+import OptionGenerator
 from ArbitraryNavigation import ArbitraryNavigation
 
 class ArbitraryNavigationOptions( ):
@@ -25,26 +26,29 @@ class ArbitraryNavigationOptions( ):
         g = env.to_graph()
         gr = g.reverse()
 
+        # Percentage
+        if isinstance(count,str):
+            count = int(count[:-1])
+            count = count*env.S/100
+
         # Add options for all the optimal states
         O = []
         if scheme == "none":
             pass
-        elif scheme == "manual":
-            raise NotImplemented()
-        elif scheme == "optimal":
-            raise NotImplemented()
         elif scheme == "random-node":
-            O = OptionEnvironment.make_options_from_random_nodes( g, gr, count, *args )
+            O = OptionGenerator.optimal_options_from_random_nodes( g, gr, count, *args )
         elif scheme == "random-path":
-            O = OptionEnvironment.make_options_from_random_paths( g, gr, count, False, *args )
-        elif scheme == "mrandom-path":
-            O = OptionEnvironment.make_options_from_random_paths( g, gr, count, True, *args )
+            O = OptionGenerator.optimal_options_from_random_paths( g, gr, count, *args )
         elif scheme == "betweenness":
-            O = OptionEnvironment.make_options_from_betweenness( g, gr, count, *args )
+            O = OptionGenerator.optimal_options_from_betweenness( g, gr, count, *args )
         elif scheme == "small-world":
-            O = OptionEnvironment.make_options_from_small_world( g, gr, count, False, *args )
-        elif scheme == "msmall-world":
-            O = OptionEnvironment.make_options_from_small_world( g, gr, count, True, *args )
+            O = OptionGenerator.optimal_options_from_small_world( g, gr, count, *args )
+        elif scheme == "betweenness+small-world":
+            O = OptionEnvironment.optimal_options_from_betweenness( g, gr, count )
+            count_ = count - len( O ) 
+            O += OptionEnvironment.optimal_options_from_small_world( g, gr, count_, *args )
+        elif scheme == "load":
+            O = OptionGenerator.options_from_file( *args )
         else:
             raise NotImplemented() 
 

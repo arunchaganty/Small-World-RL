@@ -10,7 +10,7 @@ import numpy as np
 
 from Agent import *
 from Environment import *
-from Runner import Runner
+import Runner
 from ProgressBar import ProgressBar
 
 def main( iterations, ensembles, epochs, agent_type, agent_args, env_type, env_args, file_prefix ):
@@ -35,19 +35,15 @@ def main( iterations, ensembles, epochs, agent_type, agent_args, env_type, env_a
     min_, max_ = inf * np.ones( epochs, dtype=float) , -inf * np.ones( epochs, dtype=float)
     decision_table = {}
     var = np.zeros( epochs, dtype=float )
-    env = Runner.load_env( env_type, env_args )
+    env = env_type.create( *env_args )
     for i in xrange( 1, iterations+1 ):
-        env = Runner.reload_env( env, env_type, env_args )
-        runner = Runner( env )
-
-        # Print a graph of the environment
-        # open( "%s-%d.dot"%(file_prefix, i), "w" ).write( env.to_dot() )
+        env = env_type.reset_rewards( env, *env_args )
 
         ret_ = np.zeros( epochs, dtype=float )
         # Initialise environment and agent
         for j in xrange( 1, ensembles+1 ):
-            agent = Runner.load_agent( env, agent_type, agent_args ) 
-            ret__, decision_table_ = runner.run( agent, epochs )
+            agent = agent_type( env.Q, *agent_args )
+            ret__, decision_table_ = Runner.run( env, agent, epochs )
             ret__ = np.cumsum( ret__ )
 
             # Add to ret_
@@ -122,11 +118,11 @@ if __name__ == "__main__":
 
             agent_str = sys.argv[4].split(":")
             agent_args = map( convert, agent_str[1:] )
-            agent_type = agent_str[0]
+            agent_type = Runner.load_agent( agent_str[0] )
 
             env_str = sys.argv[5].split(":")
             env_args = map( convert, env_str[1:] )
-            env_type = env_str[0]
+            env_type = Runner.load_env( env_str[0] )
 
             file_prefix = sys.argv[ 6 ]
 
