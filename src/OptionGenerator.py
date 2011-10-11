@@ -2,8 +2,10 @@
 Generate options
 """
 
+import copy
 import pickle
 import random
+import itertools
 import numpy as np
 import networkx as nx
 
@@ -23,6 +25,25 @@ def find_betweenness_maxima( g ):
             local_maximas.append( (n, b) )
     local_maximas.sort( key = lambda (x,v): -v )
     return [ x for (x,v) in local_maximas ]
+
+def choose_small_world( path_lengths, s, r ):
+    # Check distances
+    dists = path_lengths[s][1]
+    if s in dists: dists.pop( s )
+    if not dists: return None
+
+    neighbours, dists = zip( *dists.items() )
+    # Create a pr distribution
+    dists = np.power( np.array( dists, dtype=float ), -r )
+    # Zero out neighbours
+    for i in xrange( len( dists ) ):
+        if dists[i] == 1: dists[i] = 0
+
+    if not dists.any(): 
+        return None
+
+    s_ = util.choose( zip( neighbours, dists ) )
+    return s_
 
 # Optimal Primitives 
 def optimal_point_option( g, gr, dest, max_length ):
@@ -62,23 +83,32 @@ def optimal_path_option( g, gr, start, dest, length = None ):
 
     return o
 
-def optimal_options_from_random_nodes( g, gr, count ):
+def optimal_options_from_random_nodes( env, count ):
     """Create an option that takes a state to a random set of nodes"""
+    g = env.to_graph()
+    gr = g.reverse()
+
     nodes = gr.nodes()
     random.shuffle( nodes )
     options = util.progressMap( lambda n: optimal_point_option( g, gr, n, 16 ), nodes[:count] )
 
     return options
 
-def optimal_options_from_betweenness( g, gr, count ):
+def optimal_options_from_betweenness( env, count ):
+    g = env.to_graph()
+    gr = g.reverse()
+
     """Create an option that takes a state to a random set of nodes"""
     maximas = find_betweenness_maxima( g )
     options = util.progressMap( lambda n: optimal_point_option( g, gr, n, 16 ), maximas[ :count ] )
 
     return options
 
-def optimal_options_from_random_paths( g, gr, count ):
+def optimal_options_from_random_paths( env, count ):
     """Create an option that takes a state to a random set of nodes"""
+    g = env.to_graph()
+    gr = g.reverse()
+
     # Get all the edges in the graph
     nodes = g.nodes()
     random.shuffle( nodes )
@@ -96,8 +126,11 @@ def optimal_options_from_random_paths( g, gr, count ):
     options = util.progressMap( lambda (node, dest): optimal_path_option( g, gr, node, dest ), paths )
     return options
 
-def optimal_options_from_small_world( g, gr, count, r ):
+def optimal_options_from_small_world( env, count, r ):
     """Create an option that takes a state to a random nodes as per a power-law dist"""
+    g = env.to_graph()
+    gr = g.reverse()
+
     S = len( g.nodes() )
     states = range(S)
 
@@ -111,20 +144,8 @@ def optimal_options_from_small_world( g, gr, count, r ):
     for s in states:
         if len( paths ) > count: 
             break
-        dists = path_lengths[s][1]
-        dists.pop( s )
-        if not dists: 
-            continue
-
-        neighbours, dists = zip( *dists.items() )
-        # Create a pr distribution
-        dists = np.power( np.array( dists, dtype=float ), -r )
-        # Zero out neighbours
-        for i in xrange( len( dists ) ):
-            if dists[i] == 1: dists[i] = 0
-        if not dists.any(): 
-            continue
-        s_ = util.choose( zip( neighbours, dists ) )
+        s_ = choose_small_world( path_lengths, s, r )
+        if not s_: continue
         paths.append( (s,s_) )
 
     options = util.progressMap( lambda (node, dest): optimal_path_option( g, gr, node, dest ), paths )
@@ -166,7 +187,16 @@ def learn_path_option( env, start, dest, epochs, agent_type, agent_args ):
 
     return Option( I, pi, B )
 
-def learn_options_from_betweenness( epoch_budget, count, env, agent_type, agent_args ):
+def learn_option_from_policy( pi, Q, s, s_ ):
+    """Extract an option from s to s_ from pi"""
+    # The sub-policy such that Q(t,pi(t)) < Q(s_,pi(s_))
+    pi_ = dict( [ (t,a) for (t,a) in pi.items() if Q[t][a] < Q[s_][pi[a]] ] )
+    I = set([s])
+    B = { s_ : 1.0 }
+
+    return Option( I, pi_, B )
+
+def learn_options_from_betweenness( epoch_budget, count, env, env_args, agent_type, agent_args ):
     """Create an option that takes a state to a random set of nodes"""
     g = env.to_graph()
 
@@ -178,23 +208,52 @@ def learn_options_from_betweenness( epoch_budget, count, env, agent_type, agent_
 
     return options
 
-def learn_options_from_small_world( count, env, epochs, agent_type, agent_args ):
-    """Create an option that takes a state to a random set of nodes"""
+def learn_options_from_small_world( epoch_budget, count, env, env_args, agent_type, agent_args, r, searches = 20, beta = 1.1 ):
+    """
+    Learn options according to the small world distribution
+    @r - exponent
+    @alpha - Proportion taken each time
+    """
+
+    g = env.to_graph()
+    gr = g.reverse()
+    S = range( len( g.nodes() ) )
+
+    # Get all the edges in the graph
+    max_length = np.power( 16, 1.0/r ) # fn of r
+    path_lengths = nx.all_pairs_shortest_path_length( g, cutoff=max_length ).items()
+
+
+    def extract_small_world_options( pi, Q, r ):
+        """Extract n options from pi according to the small world distribution"""
+        # Choose a state at random
+        random.shuffle( S )
+        
+        for s in S:
+            # Choose a s_ ~ P_r(s) if Q(s_,pi(s_)) > Q(s, pi(s))
+            s_ = choose_small_world( path_lengths, s, r )
+            if not s_: continue
+            if Q[s_][pi[s_]] > Q[s][pi[s]]:
+                yield learn_option_from_policy( pi, Q, s, s_ )
 
     progress = ProgressBar( 0, count, mode='fixed' )
     oldprog = str(progress)
 
-    maximas = find_betweenness_maxima( g )[:count]
+    options = []
+
+    alpha = 1/float(searches)
+    count_ = int(alpha*beta*count)
     # Evenly divide the epoch budget
-    epochs_ = epochs / len(maximas)
-    while len(options) < count and epochs < epoch_budget:
-        env = env.domain.reset_rewards()
+    epochs = epoch_budget / searches
+    for i in xrange( searches ):
         # Run an agent
-        agent = Runner.load_agent( env, agent_type, agent_args ) 
-        runner.run( env, agent, epochs )
+        env = env.domain.reset_rewards( env, *env_args )
+        agent = agent_type( env.Q, *agent_args ) 
+        Runner.run( env, agent, epochs )
+
         # Extract a policy
         pi = agent.greedy_policy()
-        options += extract_small_world_options( pi, *extract_args )
+        options += list( itertools.islice( extract_small_world_options( pi, agent.Q, r ), count_ ) )
 
         # print progress
         progress.update_amount( len(options) )
@@ -204,9 +263,14 @@ def learn_options_from_small_world( count, env, epochs, agent_type, agent_args )
             oldprog=str(progress)
     print "\n"
 
-    return options
+    # We may have learnt a few extra, but that's ok; pick a random
+    # @count of them
+    random.shuffle( options )
+
+    return options[:count]
 
 def options_from_file( fname ):
     """Load options from a file"""
     options = pickle.load( fname )
     return options
+

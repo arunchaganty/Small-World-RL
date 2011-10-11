@@ -31,9 +31,13 @@ def main( epoch_budget, count, gen_type, gen_args, agent_type, agent_args, env_t
     env = env_type.create( *env_args )
 
     if gen_type == "betweenness":
-        options = OptionGenerator.learn_options_from_betweenness( epoch_budget, count, env, agent_type, agent_args )
+        options = OptionGenerator.learn_options_from_betweenness( epoch_budget, count, env, env_args, agent_type, agent_args )
+    elif gen_type == "optimal-betweenness":
+        options = OptionGenerator.optimal_options_from_betweenness( env, count )
     elif gen_type == "small-world":
-        options = OptionGenerator.learn_options_from_small_world( epoch_budget, count, env, agent_type, agent_args, *gen_args )
+        options = OptionGenerator.learn_options_from_small_world( epoch_budget, count, env, env_args, agent_type, agent_args, *gen_args )
+    elif gen_type == "optimal-small-world":
+        options = OptionGenerator.optimal_options_from_small_world( env, count, *gen_args )
     else:
         raise NotImplemented()
 
