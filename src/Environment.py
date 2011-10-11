@@ -8,7 +8,10 @@ import random
 import numpy as np
 import networkx as nx
 import util
+import sys
 import pdb
+
+from ProgressBar import ProgressBar
 
 class Environment:
     """Environment represented as an MDP"""
@@ -222,8 +225,27 @@ class OptionEnvironment( Environment ):
         random.shuffle( nodes )
         nodes = nodes[ :count ]
 
-        # Get paths to node
-        return [ OptionEnvironment.make_point_option( g, gr, n ) for n in nodes ]
+        print "Building options...\n\n"
+        progress = ProgressBar( 0, count, mode='fixed' )
+        # Needed to prevent glitches
+        print progress, "\r",
+        oldprog = str(progress)
+
+        options = []
+        for n in nodes:
+            options.append( OptionEnvironment.make_point_option( g, gr, n ) )
+
+        
+            # print progress
+            progress.increment_amount()
+            if oldprog != str(progress):
+                print progress, "\r",
+                sys.stdout.flush()
+                oldprog=str(progress)
+
+        print "\n\n"
+
+        return options
 
     @staticmethod
     def make_options_from_betweenness( g, gr, count ):
@@ -241,8 +263,27 @@ class OptionEnvironment( Environment ):
         local_maximas.sort( key = lambda (x,v): -v )
         local_maximas = [ x for (x,v) in local_maximas[ :count ] ]
 
-        # Get paths to node
-        return [ OptionEnvironment.make_point_option( g, gr, n ) for n in local_maximas ]
+        print "Building options...\n\n"
+        progress = ProgressBar( 0, count, mode='fixed' )
+        # Needed to prevent glitches
+        print progress, "\r",
+        oldprog = str(progress)
+
+        options = []
+        for n in local_maximas:
+            options.append( OptionEnvironment.make_point_option( g, gr, n ) )
+
+        
+            # print progress
+            progress.increment_amount()
+            if oldprog != str(progress):
+                print progress, "\r",
+                sys.stdout.flush()
+                oldprog=str(progress)
+
+        print "\n\n"
+
+        return options
 
     @staticmethod
     def make_options_from_random_paths( g, gr, count, markov ):
@@ -251,6 +292,12 @@ class OptionEnvironment( Environment ):
         # Get all the edges in the graph
         nodes = g.nodes()
         random.shuffle( nodes )
+
+        print "Building options...\n\n"
+        progress = ProgressBar( 0, count, mode='fixed' )
+        # Needed to prevent glitches
+        print progress, "\r",
+        oldprog = str(progress)
 
         options = []
         for node in nodes:
@@ -269,6 +316,15 @@ class OptionEnvironment( Environment ):
             if o:
                 options.append( o )
 
+            # print progress
+            progress.increment_amount()
+            if oldprog != str(progress):
+                print progress, "\r",
+                sys.stdout.flush()
+                oldprog=str(progress)
+
+        print "\n\n"
+
         # Get paths to node
         return options
 
@@ -283,6 +339,11 @@ class OptionEnvironment( Environment ):
         # Get all the edges in the graph
         path_lengths = nx.shortest_path_length( g ).items()
         random.shuffle( path_lengths )
+        print "Building options...\n\n"
+        progress = ProgressBar( 0, count, mode='fixed' )
+        # Needed to prevent glitches
+        print progress, "\r",
+        oldprog = str(progress)
 
         options = []
         for node, dists in path_lengths:
@@ -308,6 +369,15 @@ class OptionEnvironment( Environment ):
                 o = OptionEnvironment.make_path_option( g, gr, node, dest )
             if o:
                 options.append( o )
+
+            # print progress
+            progress.increment_amount()
+            if oldprog != str(progress):
+                print progress, "\r",
+                sys.stdout.flush()
+                oldprog=str(progress)
+
+        print "\n\n"
 
         # Get paths to node
         return options
