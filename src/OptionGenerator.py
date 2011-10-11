@@ -8,6 +8,7 @@ import numpy as np
 import networkx as nx
 
 import util
+import Runner
 from Environment import *
 
 def find_betweenness_maxima( g ):
@@ -129,20 +130,20 @@ def optimal_options_from_small_world( g, gr, count, r ):
     options = util.progressMap( lambda (node, dest): optimal_path_option( g, gr, node, dest ), paths )
     return options
 
-def learn_point_option( env, state, epochs, agent_type, agent_args ):
+def learn_point_option( env, s, epochs, agent_type, agent_args ):
     """Learn an option to a state"""
     # Reset the rewards of the environment to reward the 
     env.R = {}
     for s_ in xrange( env.S ):
-        env.R[ (s_,s) ] = env.REWARD_SUCCESS - env.REWARD_BIAS
+        env.R[ (s_,s) ] = env.domain.REWARD_SUCCESS - env.domain.REWARD_BIAS
     
     agent = agent_type( env.Q, *agent_args )
     Runner.run( env, agent, epochs )
     pi = agent.greedy_policy()
 
     I = set( pi.keys() )
-    I.remove( dest )
-    B = { state: 1.0 }
+    I.remove( s )
+    B = { s: 1.0 }
 
     return Option( I, pi, B )
 
@@ -153,7 +154,7 @@ def learn_path_option( env, start, dest, epochs, agent_type, agent_args ):
     env.start_set = set([start])
     env.end_set = set([dest])
     for s_ in xrange( env.S ):
-        env.R[ (s_,dest) ] = env.REWARD_SUCCESS - env.REWARD_BIAS
+        env.R[ (s_,dest) ] = env.domain.REWARD_SUCCESS - env.domain.REWARD_BIAS
     
     agent = agent_type( env.Q, *agent_args )
     Runner.run( env, agent, epochs )
@@ -165,11 +166,47 @@ def learn_path_option( env, start, dest, epochs, agent_type, agent_args ):
 
     return Option( I, pi, B )
 
-def extract_options( policy ):
-    pass
+def learn_options_from_betweenness( epoch_budget, count, env, agent_type, agent_args ):
+    """Create an option that takes a state to a random set of nodes"""
+    g = env.to_graph()
+
+    maximas = find_betweenness_maxima( g )[:count]
+    # Evenly divide the epoch budget
+    epochs = epoch_budget / len(maximas)
+
+    options = util.progressMap( lambda n: learn_point_option( env, n, epochs, agent_type, agent_args ), maximas )
+
+    return options
+
+def learn_options_from_small_world( count, env, epochs, agent_type, agent_args ):
+    """Create an option that takes a state to a random set of nodes"""
+
+    progress = ProgressBar( 0, count, mode='fixed' )
+    oldprog = str(progress)
+
+    maximas = find_betweenness_maxima( g )[:count]
+    # Evenly divide the epoch budget
+    epochs_ = epochs / len(maximas)
+    while len(options) < count and epochs < epoch_budget:
+        env = env.domain.reset_rewards()
+        # Run an agent
+        agent = Runner.load_agent( env, agent_type, agent_args ) 
+        runner.run( env, agent, epochs )
+        # Extract a policy
+        pi = agent.greedy_policy()
+        options += extract_small_world_options( pi, *extract_args )
+
+        # print progress
+        progress.update_amount( len(options) )
+        if oldprog != str(progress):
+            print progress, "\r",
+            sys.stdout.flush()
+            oldprog=str(progress)
+    print "\n"
+
+    return options
 
 def options_from_file( fname ):
     """Load options from a file"""
     options = pickle.load( fname )
     return options
-

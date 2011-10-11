@@ -80,6 +80,8 @@ def convert(arg):
         return int(arg)
     elif re.match("[0-9]*\.[0-9]+", arg):
         return float(arg)
+    elif re.match("[0-9]*e[0-9]+", arg):
+        return int(float(arg))
     else:
         return arg
 
