@@ -119,7 +119,7 @@ class ArbitraryNavigation():
     @staticmethod
     def create( height, width ):
         """Create a place from @spec"""
-        return Environment( *ArbitraryNavigation.make_mdp( (height, width) ) )
+        return Environment( ArbitraryNavigation, *ArbitraryNavigation.make_mdp( (height, width) ) )
 
     @staticmethod
     def reset_rewards( env, height, width ):
@@ -137,5 +137,5 @@ class ArbitraryNavigation():
         start_set = None
         end_set = [ s ]
 
-        return Environment( env.S, env.A, env.P, R, env.R_bias, start_set, end_set )
+        return Environment( ArbitraryNavigation, env.S, env.A, env.P, R, env.R_bias, start_set, end_set )
 

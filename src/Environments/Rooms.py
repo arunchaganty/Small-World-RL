@@ -202,7 +202,7 @@ class Rooms():
             else:
                 road_map = Rooms.make_map_from_txt_file( spec )
 
-        return Environment( *Rooms.make_mdp( road_map ) )
+        return Environment( Rooms, *Rooms.make_mdp( road_map ) )
 
     @staticmethod
     def reset_rewards( env, spec ):
@@ -229,4 +229,4 @@ class Rooms():
         start_set = None
         end_set = [ s ]
 
-        return Environment( env.S, env.A, env.P, R, env.R_bias, start_set, end_set )
+        return Environment( Rooms, env.S, env.A, env.P, R, env.R_bias, start_set, end_set )

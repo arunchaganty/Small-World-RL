@@ -23,8 +23,6 @@ class RoomsOptions( ):
         """
 
         env = Rooms.create( spec )
-        g = env.to_graph()
-        gr = g.reverse()
 
         # Percentage
         if isinstance(count,str):
@@ -36,27 +34,27 @@ class RoomsOptions( ):
         if scheme == "none":
             pass
         elif scheme == "random-node":
-            O = OptionGenerator.optimal_options_from_random_nodes( g, gr, count, *args )
+            O = OptionGenerator.optimal_options_from_random_nodes( env, count, *args )
         elif scheme == "random-path":
-            O = OptionGenerator.optimal_options_from_random_paths( g, gr, count, *args )
+            O = OptionGenerator.optimal_options_from_random_paths( env, count, *args )
         elif scheme == "betweenness":
-            O = OptionGenerator.optimal_options_from_betweenness( g, gr, count, *args )
+            O = OptionGenerator.optimal_options_from_betweenness( env, count, *args )
         elif scheme == "small-world":
-            O = OptionGenerator.optimal_options_from_small_world( g, gr, count, *args )
+            O = OptionGenerator.optimal_options_from_small_world( env, count, *args )
         elif scheme == "betweenness+small-world":
-            O = OptionEnvironment.optimal_options_from_betweenness( g, gr, count )
+            O = OptionEnvironment.optimal_options_from_betweenness( env, count )
             count_ = count - len( O ) 
-            O += OptionEnvironment.optimal_options_from_small_world( g, gr, count_, *args )
+            O += OptionEnvironment.optimal_options_from_small_world( env, count_, *args )
         elif scheme == "load":
             O = OptionGenerator.options_from_file( *args )
         else:
             raise NotImplemented() 
 
-        return OptionEnvironment( env.S, env.A, env.P, env.R, env.R_bias, env.start_set, env.end_set, O )
+        return OptionEnvironment( RoomsOptions, env.S, env.A, env.P, env.R, env.R_bias, env.start_set, env.end_set, O )
 
     @staticmethod
     def reset_rewards( env, spec, *args ):
         O = env.O
         env = Rooms.reset_rewards( env, spec )
-        return OptionEnvironment( env.S, env.A, env.P, env.R, env.R_bias, env.start_set, env.end_set, O )
+        return OptionEnvironment( RoomsOptions, env.S, env.A, env.P, env.R, env.R_bias, env.start_set, env.end_set, O )
 

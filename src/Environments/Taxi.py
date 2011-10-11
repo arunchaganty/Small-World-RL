@@ -191,7 +191,7 @@ class Taxi():
             road_map, starts = Taxi.make_map_from_size( 5, 5 )
         else:
             road_map, starts = Taxi.make_map_from_file( spec )
-        return Environment( *Taxi.make_mdp( road_map, starts ) )
+        return Environment( Taxi, *Taxi.make_mdp( road_map, starts ) )
 
     @staticmethod
     def reset_rewards( env, *args ):

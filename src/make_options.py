@@ -29,7 +29,6 @@ def main( epoch_budget, count, gen_type, gen_args, agent_type, agent_args, env_t
     """
 
     env = env_type.create( *env_args )
-    env.domain = env_type
 
     if gen_type == "betweenness":
         options = OptionGenerator.learn_options_from_betweenness( epoch_budget, count, env, agent_type, agent_args )

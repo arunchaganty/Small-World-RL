@@ -15,6 +15,7 @@ from ProgressBar import ProgressBar
 
 class Environment:
     """Environment represented as an MDP"""
+    domain = None
     S = 0
     A = 0
     P = []
@@ -24,7 +25,8 @@ class Environment:
 
     state = 0
 
-    def __init__( self, S, A, P, R, R_bias, start_set, end_set ):
+    def __init__( self, domain, S, A, P, R, R_bias, start_set, end_set ):
+        self.domain = domain
         self.S = S 
         self.A = A 
         self.P = P
@@ -157,8 +159,8 @@ class OptionEnvironment( Environment ):
     """
     O = []
 
-    def __init__( self, S, A, P, R, R_bias, start_set, end_set, O ):
-        Environment.__init__( self, S, A, P, R, R_bias, start_set, end_set )
+    def __init__( self, domain, S, A, P, R, R_bias, start_set, end_set, O ):
+        Environment.__init__( self, domain, S, A, P, R, R_bias, start_set, end_set )
         self.O = O
 
         # Update the Q function based on the options we now have

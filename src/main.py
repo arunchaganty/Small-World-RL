@@ -36,7 +36,7 @@ def main( iterations, ensembles, epochs, agent_type, agent_args, env_type, env_a
 
     env = env_type.create( *env_args )
     for i in xrange( 1, iterations+1 ):
-        env = env_type.reset_rewards( env, *env_args )
+        env = env.domain.reset_rewards( env, *env_args )
 
         ret_ = np.zeros( epochs, dtype=float )
         # Initialise environment and agent
