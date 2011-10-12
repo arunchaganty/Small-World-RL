@@ -1,16 +1,18 @@
-PYTHON=python2
-ITERS=3
-EPOCHS="1e4" #"1e5 1e6 1e8"
-N=100
+ITERS=10
+ENSEMBLES=10
+EPOCHS=40000
 
 DD="rooms-options"
-tmp_prefix="tmp1"
+OD="options-rooms"
+tmp_prefix="rc1"
 
 # Make the directory
 if [ ! -e $DD ]; then mkdir $DD; fi;
 
-for e in $EPOCHS; do 
-    scheme="small-world"
-    PYTHONOPTIMIZE=3 $PYTHON ./make_options.py $e $N "$scheme:0.75" "MacroQ" "Rooms:../domains/rooms1.txt" $tmp_prefix
-    mv "$tmp_prefix.options" "$DD/$tmp_prefix-$e.options"
+n=200
+for o in $OD/*.options; do
+    scheme="load"
+    echo "Running options from $o..."
+    PYTHONOPTIMIZE=3 python2 ./main.py $ITERS $ENSEMBLES $EPOCHS "MacroQ" "RoomsOptions:../domains/rooms1.txt:$scheme:$n:$o" $tmp_prefix
+    mv "$tmp_prefix-return.dat" $DD/$(basename $o .options).return
 done;

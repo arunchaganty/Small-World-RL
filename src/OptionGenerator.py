@@ -190,7 +190,7 @@ def learn_path_option( env, start, dest, epochs, agent_type, agent_args ):
 def learn_option_from_policy( pi, Q, s, s_ ):
     """Extract an option from s to s_ from pi"""
     # The sub-policy such that Q(t,pi(t)) < Q(s_,pi(s_))
-    pi_ = dict( [ (t,a) for (t,a) in pi.items() if Q[t][a] < Q[s_][pi[a]] ] )
+    pi_ = dict( [ (t,(a,pr)) for (t,(a,pr)) in pi.items() if Q[t][a] < Q[s_][pi[s_][0]] ] )
     I = set([s])
     B = { s_ : 1.0 }
 
@@ -269,8 +269,8 @@ def learn_options_from_small_world( epoch_budget, count, env, env_args, agent_ty
 
     return options[:count]
 
-def options_from_file( fname ):
+def options_from_file( count, fname ):
     """Load options from a file"""
-    options = pickle.load( fname )
-    return options
+    options = pickle.load( open( fname ) )
+    return options[:count]
 

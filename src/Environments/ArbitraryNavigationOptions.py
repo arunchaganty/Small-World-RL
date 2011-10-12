@@ -48,7 +48,7 @@ class ArbitraryNavigationOptions( ):
             count_ = count - len( O ) 
             O += OptionEnvironment.optimal_options_from_small_world( env, count_, *args )
         elif scheme == "load":
-            O = OptionGenerator.options_from_file( *args )
+            O = OptionGenerator.options_from_file( *args )[:count]
         else:
             raise NotImplemented() 
 
