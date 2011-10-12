@@ -26,7 +26,7 @@ class Agent:
             actions = self.Q[ s ]
             max_value = max( ( pr for (a,pr) in actions ) )
             a = random.choice( tuple( a for (a,pr) in actions if pr == max_value ) )
-            pi[s] = (a,1.0)
+            pi[s] = ((a,1.0),)
         return pi
 
 class ValueAgent( Agent ):
