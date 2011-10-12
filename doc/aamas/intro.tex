@@ -1,57 +1,94 @@
 \section{Introduction}
 \label{sec:intro}
 
-% Problem solving in AI - Why RL
+% RL - challenges - need for structure
 Reinforcement learning (RL) is a widely studied learning framework for
 autonomous agents, particularly because of it's extreme generality; it
 addresses the problem of learning optimal agent behaviour in an unknown
-stochastic environment.
+stochastic environment. In this setting, an agent explores a state
+space, receiving rewards for actions it takes; the objective of the
+agent is to maximise it's rewards accumlated over time. However, when
+scaling up to larger domains, these agents require prohibitively large
+amounts of experience in order to learn a good policy. By allowing the
+agent to exploit the structure of environment or task, we can reduce the
+experience required.
 
-Reinforcement learning (RL) addresses to problem of learning an optimal
-behavioural strategy by directly interacting with the environment. 
+% Types of structure - temporal abstractions - options
+Structure can be imposed on a learning task through either spatial or
+temporal abstractions. With the former, the state-space is minimised
+using information about the symmetries present in the domain.
+\cite{Li2006} provides a survey of such approaches. In the latter case,
+high-level actions are introduced which capture sequences of primitive
+actions. In this light, temporal abstractions capture the notion of
+a ``subtask''. The most common approach for temporal abstractions is the
+options framework proposed by Sutton, Precup and Singh
+\cite{SuttonPrecupSingh1998}, and we build our work on this framework
+also. Work by Ravindran on relativised options \cite{Ravindran2003} show
+how temporal abstractions can be combined with spatial abstractions.
+Both spatial and temporal abstractions play an important role in
+transfer learning, where we wish to extend optimal behaviour learnt in
+one task to another task; a survey of such techniques can be found in
+\cite{Taylor2009a}.
 
-% Scaling up - challenges - need structure
-When scaling up to larger domains, 
+% Getting options - related work - deficiency
+While options provide a broad framework for temporal abstraction, there
+is still no consensus on how to choose subtasks. The prevalent view is
+that subtasks should represent skills, i.e. partially defined action
+policies that constitute a part of many reinforcement learning problems
+\cite{Thrun1995}. For this reason, much of the existing work centres
+around identifying `bottlenecks', regions that the agent tends to visit
+frequently \cite{McGovern2001}, either empirically as in
+\cite{McGovern2001}, or, more recently, using graph theoretic methods
+like betweenness centrality \cite{Simsek2008} or graph partitions
+\cite{Menache2002}. The intuition is that options that navigate an agent
+to such states helps the agent move between strongly connected
+components, thus leading to efficient exploration. 
 
-% Options as a framework
+\draft{Refine}
+These option generation schemes suffer two serious drawbacks; (i)
+inapplicable without bottlenecks, (ii) explode the decision space, (iii)
+require complete information of the MDP.
 
-% What is a useful option - why small world
+If one considered these options as additional edges to the bottleneck
+states, the resultant state-interaction graph would now be ``more''
+connected. To highlight the importance of the connectivity of the
+state-interaction graph, consider the Markov chain induced by a policy
+for an Markov decision process. It is well known that the convergence
+rate of a Markov chain (mixing time), is directly related to its
+conductance \cite{Jerrum1988}, and thus its algebraic connectivity.
 
-% Summary of contributions
+% Motivation for small world
+Recognising the importance of connectivity, we try to apply concepts
+from Kleinberg's work on small world networks, which have been shown to
+have exceptionally high algebraic connectivity, and thus fast Markov
+chain mixing times \cite{Salehi2007}, to the context of problem solving
+with autonomous agents. Small-world networks have found diverse
+applications from sensor networks, to load balancing, to swarms
+\cite{Saber2005}. A small-world network has the property that an agent
+can discover a short path to any destination using only local
+information \cite{Kleinberg2000}; by contrast, other graph models with
+a small diameter only state the existence of a short path, and do not
+guarantee that an agent would be able to find such a path.  
 
-% General Introduction
-In large domains, RL agents generally require a large number of samples to learn
-a good policy. The options framework proposed by Sutton, Precup and Singh
-\cite{SuttonPrecupSingh1998} provides extended actions for which a policy is
-already learnt, reducing the complexity of the learning task, and generally
-making the learning task faster. An open question in the options framework is
-discovering the options themselves. There has been substantial work to learn
-options, mainly focussed around identifying ``bottleneck'' states, either
-empirically as in the work bye Stolle \cite{Stolle}, or more recently, using
-graph theoretic methods like betweeness \cite{Simsek} or graph partitions
-\cite{Simsek2005} explored by Simsek and Barto.
+In our context, we construct subtasks distributed according to the small
+world distribution as follows; create an option that will take the agent
+from a state $s$ to another state $s'$ with a probability inversely
+proportional to the distance between $s$ and $s'$.We are able to prove
+that this set of subtasks enables the agent to easily solve any task by
+using only a logarithmic number of options to reach a state of maximal
+value (\secref{sec:theory}). As this scheme adds at most one additional
+option per state, we do not explode the decision space for the agent.
 
-% Motivation
-In this work, we propose a method for creating options motivated from a
-cognitive perspective, based on the following hypothesis: we memorise many
-actions, not necessarily bottleneck ones, and evolve them. Based on their
-necessity in solving problems these actions are either reinforced, or gradually
-forgotten. The actions could be of varying complexity, and it is intuitive to
-expect that we probably learn a great deal more {\em simple} actions than
-complex ones. In context of the options framework, these actions correspond to
-options, and ``complex actions'' correspond to longer options.
+Furthermore, in \secref{sec:algo}, we devise an algorithm that learns
+options according to the small world distribution from the optimal
+policies learnt on only a couple of tasks in the domain. Thus not only
+are small world options effective to use, they are also simple to learn,
+and do not require any knowledge of the MDP, nor do they need to
+construct a model. 
 
-% Our options
-A desirable set of options gives the agent a set of skills which can be put
-together to efficiently accomplish almost any task. From the perspective of the
-state-space interaction graph, this is similar to the problem of distributed
-search studied by Kleinberg \cite{Kleinberg}; adding edges to a graph such that
-any node can be efficiently reached. Guided by this intuition, the method we
-propose generates options using a generalisation of the inverse-square law,
-along the lines of the small-world graph generation model proposed by Kleinberg.
+Experiments on several standard domains show that small-world options
+outperform bottleneck-based methods, even when using suboptimal option
+policies. \draft{Do the contributions need to be made explicit?}
 
-% Summary of the results
-Our results show that agents trained using our `small-world' options indeed
-perform well, and converge to optimal performance quickly and with little
-variance. 
+\draft{Is this required?} The remainder of the paper is organised as follows. We present an overview of reinforcement learning, and the options framework in \secref{sec:background}. We then define a small world option, and prove that given such options, an agent will require to use only a logarithmic number of them to perform a task in \secref{sec:theory}. From a more practical perspective, we present an algorithm to extract these options from optimal policies learnt on several tasks in the domain in \secref{sec:algo}. We present our experimental results in \secref{sec:experiments}. Finally, we conclude in \secref{sec:conclusions}, where we present future directions for our work. \appendixref{sec:small-world-theory} contains an extension of Kleinberg's proof for the distributed search property of small-world networks which is used in \secref{sec:theory}.
 
