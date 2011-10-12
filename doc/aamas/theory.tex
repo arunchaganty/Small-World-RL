@@ -1,4 +1,4 @@
-\section{Theory}
+\section{Small World Options}
 \label{sec:theory}
 
 % Introduction and motivation for the proof
@@ -66,9 +66,9 @@ embedded function required for \thmref{thm:small-world}.
 \begin{proof}
 
     For notational convenience, let $\epsilonm = 1 - \epsilon$. From the Bellman optimality condition, we get the value of $o(u,v)$ to be,
-    \begin{IEEEeqnarray*}{rCl}
+    \begin{eqnarray*}
         \Qf(u, o(u,v)) &=& \E_{l}[ \gamma^{l} \Vf(v) + \sum_{i=1}^{l} \gamma^{i-1} r_i ],
-    \end{IEEEeqnarray*}
+    \end{eqnarray*}
     \noindent
     where $l$ is the length of the option, and $r_i$ is the reward
     obtained in the $i$-th step of following the option. 
@@ -91,9 +91,9 @@ embedded function required for \thmref{thm:small-world}.
         with a budget of $m$, and has a winning probability of $q < \frac{1}{2}$
         (the dealer has a winning probability of $p=1-q$). Let $L$ be
         a random variable for the length of the game. Then, 
-        \begin{IEEEeqnarray*}{rCl}
+        \begin{eqnarray*}
             g_m(x) = \sum_{l=0}^{\infty} P(L = l) x^{l} &=& \frac{1}{\lambda_1^m( x ) + \lambda_2^m( x )},
-        \end{IEEEeqnarray*}
+        \end{eqnarray*}
         \noindent
         where $\lambda_1(x) = \frac{1 + \sqrt{1 - 4pq x^2}}{2px}$, and
         $\lambda_2(x) = \frac{1 - \sqrt{1 - 4pq x^2}}{2px}$.

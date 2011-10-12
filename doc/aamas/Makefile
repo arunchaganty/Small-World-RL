@@ -2,10 +2,10 @@
 #
 
 # $Id$
-FILE = report
+FILE = paper
 OUTPUT = $(shell basename $(PWD))
 FIGURES =
-SECTIONS = macros.tex abstract.tex intro.tex theory.tex experiments.tex conclusions.tex\
+SECTIONS = macros.tex abstract.tex intro.tex background.tex useful-options.tex theory.tex experiments.tex conclusions.tex\
 		   taxi.tex small-world-theory.tex
 
 

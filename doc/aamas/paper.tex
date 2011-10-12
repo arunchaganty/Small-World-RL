@@ -1,0 +1,105 @@
+\documentclass{aamas2012}
+% Setting letter size with pdflatex
+\pdfpagewidth=8.5truein
+\pdfpageheight=11truein
+
+\usepackage{makeidx}
+\usepackage{amsmath}   
+\usepackage{amsfonts}   
+\usepackage[retainorgcmds]{IEEEtrantools}
+\usepackage{thumbpdf}
+\usepackage{multicol}   
+\usepackage{graphicx}   
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{tikz}
+\usepackage{subfigure}
+
+\usepackage{hyperref}
+\hypersetup{ 
+  pdftitle          = {Learning in a Small World},
+  pdfauthor         = {Arun Tejasvi Chaganty, Prateek Gaur, Balaraman Ravindran},
+  colorlinks        = true,
+  linkcolor         = red,
+  urlcolor          = red
+  citecolor         = blue,
+}
+
+\input{macros}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newdef{definition}{Definition}
+\newdef{example}{Example}
+\newcommand{\draft}[1]{\textbf{TODO: #1}}
+
+\title{Learning in a Small World}
+
+% Author information
+\numberofauthors{3}
+\author{ 
+\alignauthor 
+Paper  280
+% Commented until we get accepted
+% Arun Tejasvi Chaganty\\
+%        \affaddr{Deptt. of Computer Science and Engineering,}\\
+%        \affaddr{IIT Madras}\\
+%        \affaddr{Chennai, India - 600036}\\
+%        \email{arunc@cse.iitm.ac.in}
+% \alignauthor
+% Prateek Gaur\\
+%        \affaddr{Deptt. of Computer Science and Engineering,}\\
+%        \affaddr{IIT Madras}\\
+%        \affaddr{Chennai, India - 600036}\\
+%        \email{prtkgaur@cse.iitm.ac.in}
+% \alignauthor
+% Balaraman Ravindran\\
+%        \affaddr{Deptt. of Computer Science and Engineering,}\\
+%        \affaddr{IIT Madras}\\
+%        \affaddr{Chennai, India - 600036}\\
+%        \email{ravi@cse.iitm.ac.in}
+} 
+
+\begin{document}
+
+\maketitle
+%\pagebreak
+
+% Outline
+\input{abstract}
+
+\category{I.2.6}{Artificial Intelligence}{Learning}
+\category{I.2.8}{Artificial Intelligence}{Problem Solving, Control Methods and Search}
+\terms{Algorithms, Theory, Experimentation}
+\keywords{reinforcement learning, options framework, social network analysis, small world phenomenon}
+
+% Introduction: Motivate the problem (using lifelong learning,
+% transfer)
+% Emphasise on not blowing up state space, summarise results
+\input{intro}
+% Background: Define MDPs, Options, Small World Phenomenon
+\input{background}
+% What are useful options? Highlight connection to connectivity, and
+% then to small world options
+\input{useful-options}
+% Prove the interesting result
+\input{theory}
+% Describe the algorithms to; a) generate small world options b)
+% extract from learning episodes
+\input{algo}
+% Experiment section
+\input{experiments}
+% Discuss conclusions
+\input{conclusions}
+
+\bibliographystyle{abbrv}
+\bibliography{ref}{}
+
+%\balancecolumns
+
+\appendix
+\input{small-world-theory}
+%\balancecolumns 
+
+\end{document}
+

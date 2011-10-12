@@ -29,10 +29,10 @@ distribution $p(u,v)$.
     \log n )$, and $p(u,v) = \|u - v\|^{-k} \theta( (\log n)^{-1} )$.
 \end{lemma}
 \begin{proof}
-    \begin{IEEEeqnarray*}{rCl}
+    \begin{eqnarray*}
         c_u &=& \sum_{v \ne u} \|u - v\|^{-k} \\
             &=& \sum_{j=1}^{k(n-1)} \sball_j(u) j^{-k}.
-    \end{IEEEeqnarray*}
+    \end{eqnarray*}
     It can easily be shown that the $\sball_l(u) = \theta( l^{k-1} )$.
     Thus, the $c_u$ reduces to a harmonic sum, and hence, $c_u =
     \theta( \log n )$.  The second part of the lemma follows as
@@ -79,19 +79,19 @@ We are now ready to prove the following general result.
     between these two nodes is at least $\kappa_1^{-k} (2^{j+2} + 2
     c_1)^{-k} \theta(\log n)^{-1} $. Thus, 
 
-    \begin{IEEEeqnarray*}{rCl}
+    \begin{eqnarray*}
         P(u, \ballf_{2^{j}} ) &\ge& (1-\epsilon) (\frac{2^{j}+c_2}{\kappa_2})^{k} \times (\frac{2^{j+2} + 2 c_1}{\kappa_1})^{-k} \theta( \log n )^{-1}  \\
         &\ge& \frac{(1-\epsilon)}{\theta( \log n )} \times (\frac{\kappa_1}{4\kappa_2} )^{k} \times ( \frac{ 1 + \frac{c_2}{2^{j}} }{ 1 + \frac{c_1}{2 \times 2^{j}} })^{k}\\
         &\ge& \frac{(1-\epsilon)}{\theta( \log n )} \times (\frac{\kappa_1}{4\kappa_2} )^{k} \times ( \frac{ 1 + c_2 }{ 1 + \frac{c_1}{2} })^{k} .\\
-    \end{IEEEeqnarray*}
+    \end{eqnarray*}
 
     Let number of decisions required to leave phase $j$ be $X_j$. Then, 
-    \begin{IEEEeqnarray*}{rCl}
+    \begin{eqnarray*}
         \E[X_j] &\le& \sum_{i=0}^{\infty} (1 - P(u, \ballf_{2^{j}} ))^i \\
                 &\le& \frac{1}{P(u, \ballf_{2^{j}} )} \\
                 &\le& \theta( \log n ) \frac{1}{(1-\epsilon)} (\frac{4 \kappa_2}{\kappa_1})^{k} ( \frac{ 1 + \frac{c_1}{2} }{ 1 + c_2 })^{k}\\
                 &\le& \theta( \log n ).
-    \end{IEEEeqnarray*}
+    \end{eqnarray*}
     Thus, $\E[X_j]$ is $O(\log n)$. By construction, there are at most $\log n$
     phases, and thus at most $O((\log n)^2)$ decisions.
     \\ \qed
