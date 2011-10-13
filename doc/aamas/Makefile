@@ -5,7 +5,7 @@
 FILE = paper
 OUTPUT = $(shell basename $(PWD))
 FIGURES =
-SECTIONS = macros.tex abstract.tex intro.tex background.tex theory.tex experiments.tex conclusions.tex\
+SECTIONS = macros.tex abstract.tex intro.tex background.tex theory.tex algo.tex experiments.tex conclusions.tex\
 		   taxi.tex small-world-theory.tex
 
 

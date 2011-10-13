@@ -10,9 +10,10 @@ a single `path option' to another state $s'$, where $s'$ is chosen with
 probability $P_r(s,s') \propto \|s-s'\|^{-r}$. A path option $o_p(s,s')$
 is an option with $\initset = \{s\}$, $\stopcond = \{s'\}$, and an
 optimal policy to reach $s'$ for $\pi$. Intuitively, it is an option
-that takes the agent from $s$ to $s'$. Note that while $O(|S|)$ options
-are created, only one additional option is available in any state, and
-thus the decision-space for the agent is not significantly larger.
+that takes the agent from $s$ to $s'$. In practice, we may generate path
+options only for a subset of $|S|$. Note that while $O(|S|)$ options are
+created, only one additional option is available in any state, and thus
+the decision-space for the agent is not significantly larger.
 
 % What is the guarantee we give about them?
 On an $r$-dimensional lattice, $\klein_r$, the distance from any node
@@ -40,18 +41,18 @@ corollary of the following theorem,
     |V|)^2 )$ steps to reach $M_f$.
 \end{theorem}
 \begin{proof}
-    Refer \appendixref{sec:small-worlds}.
-    \\ \qed
+  \draft{Sketch the proof, or atleast highlight the insight}.
+    Refer \appendixref{sec:small-world-theory}.
 \end{proof}
 
 % Graph-based
 It is easy to construct a graph $\graph_{\mdp}$ out of the state-space
 described by an MDP. The states $\states$ become the nodes of the graph,
-and $\actions$ become the edges, with the transition probabilities as
-weights. The edges can also be attributed with the rewards described by
-$\rewards$. Options can be viewed to be paths along the graph. As an
-example, the Taxi domain defined earlier translates to the graph shown
-in \figref{fig:taxi-graph}.
+and actions $\actions$ become the edges, with the transition
+probabilities as weights. The edges can also be attributed with the
+rewards described by $\rewards$. Options can be viewed to be paths along
+the graph. As an example, the Taxi domain defined earlier translates to
+the graph shown in \figref{fig:taxi-graph}.
 
 Consider an MDP $\mdp_{\klein_r}$ with states connected in
 a $r$-dimensional lattice, and noisy navigational actions between
@@ -136,7 +137,6 @@ embedded function required for \thmref{thm:small-world}.
             \frac{1}{(\frac{2}{2px})^m}  &\le&  g_m(x) &\le& \sum_{l=m}^{\infty} P(L = l) x^{m} \\
             (px)^m  &\le&  g_m(x) &\le& x^m.
         \end{IEEEeqnarray*}
-        \qed
     \end{proof}
 
     In our situation, $p = 1 - \epsilon = \epsilonm > \frac{1}{2}$, $q = \epsilon$, and $m = \|u - v\|$.     
@@ -150,6 +150,5 @@ embedded function required for \thmref{thm:small-world}.
         (\epsilonm \gamma)^{\|u-v\|} \Vf(v) &\le& \Vf(u) &\le& \gamma^{\|u-v\|} \Vf(v) + \frac{1}{1 - \gamma} \\
         \|u-v\| \log \frac{1}{\gamma} - \log \frac{1}{1-\gamma} &\le& \|u - v\|_V &\le& \|u-v\| \log (\frac{1}{\epsilonm \gamma}).
     \end{IEEEeqnarray*}
-    \qed
 \end{proof}
 

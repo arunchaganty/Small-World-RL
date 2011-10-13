@@ -64,6 +64,11 @@ corresponding $Q$ function update will be,
     Q(s,o) &=& Q(s,o) + \alpha [ r + \gamma^{k} \max_{o' \in \actions \cup \options} Q(s',o') - Q(s,o) ].
 \end{eqnarray*}
 
+Different tasks in the same domain can be described by different
+$\rewards$. Let $\rewards$ be sampled from the family $\Rewards$. Our
+objective then is to find a set of options $O$ that reduces the expected
+learning time over $\Rewards$.
+
 \begin{figure*}[th]
     \center
     \subfigure{
@@ -78,6 +83,7 @@ corresponding $Q$ function update will be,
 \end{figure*}
 
 \begin{example}
+  \label{example:taxi}
 To make the discussion more tangible, let us look at an example, the
 Taxi domain, shown in \figref{fig:taxi-domain}. The agent is a taxi
 navigating in this road-map. It must pick up a passenger at one of the
