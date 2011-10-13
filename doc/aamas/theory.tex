@@ -1,55 +1,67 @@
 \section{Small World Options}
 \label{sec:theory}
 
-% Constructing Options 
-We construct an option `short-circuiting' two states using a policy constructed
-from the shortest path on this graph. For every state $x$, we select a state to
-be short-circuited $y$ with using a multinomial distribution with weight
-proportional to the distance between them in the state space, i.e. $w(x,y)
-\propto d(x,y)^{-r}$. 
+% What are small world options
+In Kleinberg's small-world network model, each node $u$ is given one
+`long-range' edge to a node $v$, which was chosen with a probability
+$P_r(u,v) \propto \|u-v\|^{-r}$, where $\|u-v\|$ denotes the distance
+between $u$ and $v$ in the graph. Similarly for each state $s$, we add
+a single `path option' to another state $s'$, where $s'$ is chosen with
+probability $P_r(s,s') \propto \|s-s'\|^{-r}$. A path option $o_p(s,s')$
+is an option with $\initset = \{s\}$, $\stopcond = \{s'\}$, and an
+optimal policy to reach $s'$ for $\pi$. Intuitively, it is an option
+that takes the agent from $s$ to $s'$. Note that while $O(|S|)$ options
+are created, only one additional option is available in any state, and
+thus the decision-space for the agent is not significantly larger.
 
-Another example of constructing an option on this graph would be to
-define a policy that takes any state to a particular one along the
-shortest path.  This is the approach adopted by Simsek and Barto in
-\cite{Simsek2008}, where local maxima of the betweenness scores are used
-to identify bottlenecks, and options defined to reach these bottlenecks
-optimally from any state.
-% Introduction and motivation for the proof
-For a given MDP $\mdp$, let $\graph$ be the state-interaction graph, and
-consider `path options' to be additional edges in this graph. The
-decisions made by an $\epsilon$-greedy agent in $\mdp$ is very similar
-to those made by a distributed $\epsilon$-greedy algorithm searching for
-the maxima of the value function $\Vf$ embedded in $\graph$. 
-
-Using this intuition, we wish to show that given small world options,
-an $\epsilon$-greedy agent will be able reach to the maxima of the
-optimal value function in $O( (\log n)^2 )$ decision epochs. This
-statement is a corollary of the following theorem,
+% What is the guarantee we give about them?
+On an $r$-dimensional lattice, $\klein_r$, the distance from any node
+$u$ to a target node $t$ is bounded by $\|u-t\|$, a quantity which is
+locally computable. When given long-range edges distributed according to
+$P_r$, Kleinberg showed that the greedy distributed algorithm
+$\greedyalgo$ that chooses a neighbour $v$ closest to $t$ will reach $t$
+with an expected time $O(\log(|V|)^2)$. This follows as a trivial
+corollary of the following theorem,
 
 \begin{theorem}
     \label{thm:small-world}
+    %
     Let $f : V \to \Re$ be a function embedded on the graph
-    $\graph(V,E)$, such that, $\kappa_1 \|u-v\| - c_1 \le \|f(u) -
-    f(v)\| \le \kappa_2 \|u - v\| - c_2$, where $0 \le \kappa_1 \le
-    \kappa_2$, and $0 \le c_2 \le \frac{c_1}{2}$. Let \egreedyalgo be
-    an algorithm which chooses with probability $1-\epsilon$ to
-    transit to the neighbouring state closest to a global maxima of
-    $f$, $M_f$, i.e. $N(u) = \argmin_v \|f(v) - f(M_f)\|$ (i.e.
-    $\epsilon$-greedy algorithm with respect to $f$).
+    $\graph(V,E)$, such that, $\kappa_1 \|u-v\| - c_1 \le \|f(u)
+    - f(v)\| \le \kappa_2 \|u - v\| - c_2$, where $0 \le \kappa_1 \le
+    \kappa_2$, and $0 \le c_2 \le \frac{c_1}{2}$. Let $M_f$ be the
+    global maxima of $f$. Let \egreedyalgo be an $\epsilon$-greedy
+    algorithm with respect to $f$, i.e.  an algorithm which chooses with
+    probability $1-\epsilon$ to transit to the neighbouring state
+    closest to $M_f$, i.e. $N(u) = \argmin_v \|f(v) - f(M_f)\|$.
     
-    If $\graph(V,E)$ is $k$-dimensional lattice, and contains edges
-    distributed according to the inverse power law $p(u,v) \propto
-    \|u-v\|^{-k}$, then \egreedyalgo takes $O( (\log n)^2 )$ decisions
-    to reach $M_f$.
+    If $\graph(V,E)$ is $k$-dimensional lattice, and contains a long
+    distance edge distributed $P_k$, then \egreedyalgo takes $O( (\log
+    |V|)^2 )$ steps to reach $M_f$.
 \end{theorem}
 \begin{proof}
     Refer \appendixref{sec:small-worlds}.
     \\ \qed
 \end{proof}
 
-We are left to prove that $\Vf$ does satisfy the above property.
-First, let us formalise the notion of a `path' option.
+% Graph-based
+It is easy to construct a graph $\graph_{\mdp}$ out of the state-space
+described by an MDP. The states $\states$ become the nodes of the graph,
+and $\actions$ become the edges, with the transition probabilities as
+weights. The edges can also be attributed with the rewards described by
+$\rewards$. Options can be viewed to be paths along the graph. As an
+example, the Taxi domain defined earlier translates to the graph shown
+in \figref{fig:taxi-graph}.
 
+Consider an MDP $\mdp_{\klein_r}$ with states connected in
+a $r$-dimensional lattice, and noisy navigational actions between
+states. We claim that using path options distributed according to $P_r$,
+an $\epsilon$-greedy agent can reach a state of maximal value using
+$O(\log(|S|)^2)$ options. Clearly, the value function $\Vf$ is a local
+property of the state. Thus, if we can relate $\Vf$ to the distance from
+the target state, we can apply \thmref{thm:small-world}.
+
+In order to do so, we strengthen the conditions on a option: 
 \begin{definition}
     A {\em robust path option} $o(u,v)$, where $u,v \in \states$ is an
     option that takes the agent from $u$ to $v$ `robustly', in the
@@ -62,7 +74,7 @@ First, let us formalise the notion of a `path' option.
 \end{definition}
 
 The following lemma shows that $\Vf$ satisfies the properties of a
-embedded function required for \thmref{thm:small-world}.
+embedded function required for \thmref{thm:small-world}. 
 
 \begin{lemma}
     \label{lm:distance}
@@ -73,11 +85,10 @@ embedded function required for \thmref{thm:small-world}.
     \end{IEEEeqnarray*}
     \noindent
     where $k_1 = \log \frac{1}{\gamma} $, $k_2 = \log
-    \frac{!}{(1-\epsilon)\gamma}$, and $c_1 = \log
+    \frac{1}{(1-\epsilon)\gamma}$, and $c_1 = \log
     \frac{1}{1-\gamma}$.
 \end{lemma}
 \begin{proof}
-
     For notational convenience, let $\epsilonm = 1 - \epsilon$. From the Bellman optimality condition, we get the value of $o(u,v)$ to be,
     \begin{eqnarray*}
         \Qf(u, o(u,v)) &=& \E_{l}[ \gamma^{l} \Vf(v) + \sum_{i=1}^{l} \gamma^{i-1} r_i ],
@@ -117,7 +128,6 @@ embedded function required for \thmref{thm:small-world}.
         \end{IEEEeqnarray*}
     \end{lemma}
     \begin{proof}
-
         For the first part. refer \cite{Feller1968}.
 
         The second part follows as a corollary, 
@@ -138,12 +148,8 @@ embedded function required for \thmref{thm:small-world}.
     \begin{IEEEeqnarray*}{rCCCl}
         \E_{l}[ \gamma^{l} ] \Vf(v) &\le& \Vf(u) &\le& \E_{l}[ \gamma^{l} ] \Vf(v) + \frac{1}{1 - \gamma} \\
         (\epsilonm \gamma)^{\|u-v\|} \Vf(v) &\le& \Vf(u) &\le& \gamma^{\|u-v\|} \Vf(v) + \frac{1}{1 - \gamma} \\
-        \|u-v\| \log (\epsilonm \gamma) + \log \Vf(v) &\le& \log \Vf(u) &\le& \|u-v\| \log \gamma + \log \Vf(v) + \log \frac{1}{1 - \gamma} \\
         \|u-v\| \log \frac{1}{\gamma} - \log \frac{1}{1-\gamma} &\le& \|u - v\|_V &\le& \|u-v\| \log (\frac{1}{\epsilonm \gamma}).
     \end{IEEEeqnarray*}
     \qed
 \end{proof}
-
-Thus, an $\epsilon$-greedy agent with small-world options will reach
-the maximal value function in $O(\log n)$ decisions.
 
