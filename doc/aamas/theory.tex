@@ -36,14 +36,26 @@ corollary of the following theorem,
     probability $1-\epsilon$ to transit to the neighbouring state
     closest to $M_f$, i.e. $N(u) = \argmin_v \|f(v) - f(M_f)\|$.
     
-    If $\graph(V,E)$ is $k$-dimensional lattice, and contains a long
-    distance edge distributed $P_k$, then \egreedyalgo takes $O( (\log
+    If $\graph(V,E)$ is $r$-dimensional lattice, and contains a long
+    distance edge distributed $P_r$, then \egreedyalgo takes $O( (\log
     |V|)^2 )$ steps to reach $M_f$.
 \end{theorem}
 \begin{proof}
-  \draft{Sketch the proof, or atleast highlight the insight}.
-    Refer \appendixref{sec:small-world-theory}.
+  The key insight of the proof is that with edges distributed according
+  to $P_r$, there will always be edge within the neighbourhood of a node
+  to an exponentially smaller neighbourhood of the target. Thus, the
+  agent will only require to hop through $\log |V|$ `neighbourhoods'. By
+  bounding the time spent in each neighbourhood to $\log |V|$, we arrive
+  at the result. We refer the reader to
+  \appendixref{sec:small-world-theory} for the complete proof.
 \end{proof}
+
+\begin{figure}[th]
+    \centering
+    \includegraphics[height=2in]{figures/taxi1}
+    \label{fig:taxi-graph}
+    \caption{The State Space Graph for Taxi}
+\end{figure}
 
 % Graph-based
 It is easy to construct a graph $\graph_{\mdp}$ out of the state-space
@@ -62,7 +74,6 @@ $O(\log(|S|)^2)$ options. Clearly, the value function $\Vf$ is a local
 property of the state. Thus, if we can relate $\Vf$ to the distance from
 the target state, we can apply \thmref{thm:small-world}.
 
-In order to do so, we strengthen the conditions on a option: 
 \begin{definition}
     A {\em robust path option} $o(u,v)$, where $u,v \in \states$ is an
     option that takes the agent from $u$ to $v$ `robustly', in the
@@ -150,5 +161,6 @@ embedded function required for \thmref{thm:small-world}.
         (\epsilonm \gamma)^{\|u-v\|} \Vf(v) &\le& \Vf(u) &\le& \gamma^{\|u-v\|} \Vf(v) + \frac{1}{1 - \gamma} \\
         \|u-v\| \log \frac{1}{\gamma} - \log \frac{1}{1-\gamma} &\le& \|u - v\|_V &\le& \|u-v\| \log (\frac{1}{\epsilonm \gamma}).
     \end{IEEEeqnarray*}
+
 \end{proof}
 

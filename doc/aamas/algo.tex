@@ -1,4 +1,4 @@
-\section{Constructing Options from Experience} 
+\section{Options from Experience} 
 \label{sec:algo}
 
 In \secref{sec:theory}, we remarked that we need to generate $O(|S|)$
@@ -26,13 +26,13 @@ construct many options from a single task solution.
   \caption{Small World Options from Experience}
   \label{algo:small-world-experience}
   \begin{algorithmic}[1]
-      \REQUIRE $\mdp$, $\Rewards$, $k$, $n$, epochs, $T$
+      \REQUIRE $\mdp$, $\Rewards$, $r$, $n$, epochs, $T$
       \STATE $O \gets \emptyset$
       \FOR{ $i= 0 \to T$ }
         \STATE $\rewards \sim \Rewards$
         \STATE $Q \gets $ Solve $\mdp$ with $\rewards$ using
             $\frac{\textrm{epochs}}{T}$ epochs
-        \STATE $O' \gets $ QOptions( $Q$, $k$,
+        \STATE $O' \gets $ QOptions( $Q$, $r$,
             $\frac{n}{T}$ )
         \STATE $O \gets O \cup O'$
       \ENDFOR
@@ -43,11 +43,11 @@ construct many options from a single task solution.
   \caption{{\bf QOptions}: Options from a $Q$-Value Function}
   \label{algo:qoptions}
   \begin{algorithmic}[1]
-      \REQUIRE $Q$, $k$, $n$
+      \REQUIRE $Q$, $r$, $n$
       \STATE $O \gets \emptyset$
       \STATE $\pi \gets $ greedy policy from $Q$
       \FORALL{ $s$ in $\states$ }
-        \STATE Choose an $s'$ according to $P_k$
+        \STATE Choose an $s'$ according to $P_r$
         \IF{ $Q(s', \pi(s')) > Q(s, \pi(s))$ }
           \STATE $O \gets O \cup \tuple{\{s\}, \pi, \{s'\} \cup \{t \mid Q(s',\pi(s')) < Q(t, \pi(t))\} }$
         \ENDIF
@@ -56,8 +56,8 @@ construct many options from a single task solution.
   \end{algorithmic}
 \end{algorithm}
 
-We note here except for sampling $s'$ from $P_k$, we do not require any
+We note here except for sampling $s'$ from $P_r$, we do not require any
 knowledge of the MDP, nor do we need to construct a local model of the
 same. $s'$ can approximately be sampled using $\frac{E[l]}{\log(|S|)}$
-in place of $P_k$. 
+in place of $P_r$. 
 

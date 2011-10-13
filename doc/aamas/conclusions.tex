@@ -6,29 +6,24 @@
 We have devised a new scheme to generate options based on small world
 network model. The options generated satisfy an intuitive criteria, that
 the subtasks learnt should be easily composed to solve any other task.
-The options also greatly improve the connectivity properties of the
-domain.
+The options greatly improve the connectivity properties of the domain,
+without leading to a state space blow up. Finally, they are interesting
+from a theoretical perspective, as they require only a logarithmic
+number of decisions required in a learning task.
 
 % - absolutely model-free
 Experiments run on standard domains show significantly faster learning
 rates using small world options. At the same time, we have shown that
-learning small world options can be significantly cheaper than learning
-`bottleneck' options. Another advantage of the scheme is that is does
-not ever require the model of the MDP. We find it remarkable that we can
-learn near optimal behaviour just from the policies of on some tasks
-
-
-% - theoretical interest
-The scheme does not perform any global analysis, and does not require
-the model. We have shown that sample-wise, it can be far cheaper than
-other bottleneck based methods. Does not lead to state space blow up.
-Also is interesting from a theoretical perspective, logarithmic number
-of decisions.
+learning small world options can be cheaper than learning bottleneck
+options, using a natural algorithm that extracts options from a handful
+of tasks it has solved. Another advantage of the scheme is that is does
+not require a model of the MDP. 
 
 % Further work
 % - dynamically add/remove options
 % - figuring out r
-We have as yet not been able to characterise what the exponent $r$
+As future work, we would like to characterise what the exponent $r$
 should be in a general domain. Given the ease with which options can be
-discovered, it would be interesting to create a dynamic scheme.
+discovered, it would be interesting to experiment with a dynamic scheme
+that adds options on the fly, while solving tasks.
 

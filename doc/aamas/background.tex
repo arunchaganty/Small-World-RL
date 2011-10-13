@@ -4,7 +4,7 @@
 % MDPs
 In reinforcement learning, the standard representation of an environment
 and task instance is a Markov decision process (MDP). An MDP can be
-represented as the tuple, $\tuple{ \states, \actions, \transitions,
+represented as the tuple, \\ $\tuple{ \states, \actions, \transitions,
 \rewards, \gamma }$, where $\states$ and $\actions$ are finite sets of
 states and actions, $\transitions: \states \times \actions \times
 \states \to [0,1]$ describes the dynamics of the world through
@@ -21,10 +21,12 @@ objective of the agent is to find a policy $\pi: \states \times \actions
 maximises the reward it accumulates in the long run, $R = \sum_{i}
 \gamma^i r_i$. $R$ is also called the return.
 
-We define the value function $Q: \states \times \actions \to \Re$ to be
-the expected return after taking the action $a$ from $s$. The optimal
-value function must satisify the Bellman equation, 
+We define the value function $V: \states \to \Re$ to be the expected
+return from $s$, and $Q: \states \times \actions \to \Re$ to be the
+expected return from $s$, after taking the action $a$. The optimal value
+function must satisfy the Bellman optimality equation, 
 \begin{eqnarray*}
+  V(s) &=& \max_{a} \rewards(s,a) + \gamma \sum_{s' \in \states} \transitions(s,a,s') V(s') \\
   Q(s,a) &=& \rewards(s,a) + \gamma \sum_{s' \in \states} \transitions(s,a,s') \max_{a'} Q(s',a').
 \end{eqnarray*}
 
@@ -69,25 +71,19 @@ $\rewards$. Let $\rewards$ be sampled from the family $\Rewards$. Our
 objective then is to find a set of options $O$ that reduces the expected
 learning time over $\Rewards$.
 
-\begin{figure*}[th]
-    \center
-    \subfigure{
-      \input{taxi}
-      \label{fig:taxi-domain}
-    }
-    \subfigure{
-      \includegraphics[height=2in]{figures/taxi1}
-      \label{fig:taxi-graph}
-    }
-    \caption{The Taxi Domain, and its State Space Graph}
-\end{figure*}
-
 \begin{example}
   \label{example:taxi}
+
+\begin{figure}[th]
+    \centering
+    \input{taxi}
+    \label{fig:taxi-domain}
+    \caption{The Taxi Domain}
+\end{figure}
 To make the discussion more tangible, let us look at an example, the
 Taxi domain, shown in \figref{fig:taxi-domain}. The agent is a taxi
 navigating in this road-map. It must pick up a passenger at one of the
-4 pads, A, B, C or D.  Subsequently, it must carry the passenger to a
+4 pads, R, G, B or Y.  Subsequently, it must carry the passenger to a
 destination, which is also one of the above four pads. The states of
 the taxi would then be a tuple containing the location of the
 passenger (in one of the four pads, or within the taxi), the

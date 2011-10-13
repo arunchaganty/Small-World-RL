@@ -16,9 +16,9 @@ In this section we will tackle the proof of the main theorem in
   transit to the neighbouring state closest to $M_f$, i.e. $N(u)
   = \argmin_v \|f(v) - f(M_f)\|$.
   
-  If $\graph(V,E)$ is $k$-dimensional lattice, and contains a long
-  distance edge distributed according to $P_k: p(u,v) \propto
-  \|u-v\|^{-k}$, then \egreedyalgo takes $O( (\log |V|)^2 )$ steps to
+  If $\graph(V,E)$ is $r$-dimensional lattice, and contains a long
+  distance edge distributed according to $P_r: p(u,v) \propto
+  \|u-v\|^{-r}$, then \egreedyalgo takes $O( (\log |V|)^2 )$ steps to
   reach $M_f$.
 \end{theorem}
 \begin{proof}
@@ -41,17 +41,17 @@ convenience, we take $\ballf_l$ to be $\ballf_l(M_f)$.
 
 \begin{lemma}
     The inverse normalised coefficient for $p(u,v)$ is $c_u = \theta(
-    \log n )$, and $p(u,v) = \|u - v\|^{-k} \theta(\log n)^{-1}$.
+    \log n )$, and $p(u,v) = \|u - v\|^{-r} \theta(\log n)^{-1}$.
 \end{lemma}
 \begin{proof}
     \begin{eqnarray*}
-        c_u &=& \sum_{v \ne u} \|u - v\|^{-k} \\
-            &=& \sum_{j=1}^{k(n-1)} \sball_j(u) j^{-k}.
+        c_u &=& \sum_{v \ne u} \|u - v\|^{-r} \\
+            &=& \sum_{j=1}^{r(n-1)} \sball_j(u) j^{-r}.
     \end{eqnarray*}
     It can easily be shown that the $\sball_l(u) = \theta( l^{k-1} )$.
     Thus, $c_u$ reduces to a harmonic sum, and hence is equal to
     $\theta( \log n )$. The second part of the lemma follows as $p(u,v)
-    = \frac{ \|u - v\|^{-k} }{c_u}$. 
+    = \frac{ \|u - v\|^{-r} }{c_u}$. 
 \end{proof}
 
 We are now ready to prove that \egreedyalgo takes $O( (\log |V|)^2 )$
@@ -64,20 +64,20 @@ The size of $\ballf_{2^{j}}$ is at least $|\ball_{\frac{
 distance between $u$ and a node in $\ballf_{2^{j}}$ is at most
 $\frac{2^{j+1} + c_1}{ \kappa_1 } + \frac{2^{j} + c_2}{\kappa_2}
 < 2(\frac{2^{j+1} + c_2}{\kappa_2})$. The probability of a link between
-these two nodes is at least $(\frac{2^{j+2} + 2 c_1}{\kappa_1})^{-k}
+these two nodes is at least $(\frac{2^{j+2} + 2 c_1}{\kappa_1})^{-r}
 \theta(\log n)^{-1} $. Thus, 
 
 \begin{eqnarray*}
-    P(u, \ballf_{2^{j}} ) &\ge& \frac{(1-\epsilon)}{\theta( \log n )} (\frac{2^{j}+c_2}{\kappa_2})^{k} \times (\frac{2^{j+2} + 2 c_1}{\kappa_1})^{-k} \\
-    &\ge& \frac{(1-\epsilon)}{\theta( \log n )} \times (\frac{\kappa_1}{4\kappa_2} )^{k} \times ( \frac{ 1 + \frac{c_2}{2^{j}} }{ 1 + \frac{c_1}{2 \times 2^{j}} })^{k}\\
-    &\ge& \frac{(1-\epsilon)}{\theta( \log n )} \times (\frac{\kappa_1}{4\kappa_2} )^{k} \times ( \frac{ 1 + c_2 }{ 1 + \frac{c_1}{2} })^{k} .\\
+    P(u, \ballf_{2^{j}} ) &\ge& \frac{(1-\epsilon)}{\theta( \log n )} (\frac{2^{j}+c_2}{\kappa_2})^{r} \times (\frac{2^{j+2} + 2 c_1}{\kappa_1})^{-r} \\
+    &\ge& \frac{(1-\epsilon)}{\theta( \log n )} \times (\frac{\kappa_1}{4\kappa_2} )^{r} \times ( \frac{ 1 + \frac{c_2}{2^{j}} }{ 1 + \frac{c_1}{2 \times 2^{j}} })^{r}\\
+    &\ge& \frac{(1-\epsilon)}{\theta( \log n )} \times (\frac{\kappa_1}{4\kappa_2} )^{r} \times ( \frac{ 1 + c_2 }{ 1 + \frac{c_1}{2} })^{r} .\\
 \end{eqnarray*}
 
 Let number of decisions required to leave phase $j$ be $X_j$. Then, 
 \begin{eqnarray*}
     \E[X_j] &\le& \sum_{i=0}^{\infty} (1 - P(u, \ballf_{2^{j}} ))^i \\
             &\le& \frac{1}{P(u, \ballf_{2^{j}} )} \\
-            &\le& \theta( \log n ) \frac{1}{(1-\epsilon)} (\frac{4 \kappa_2}{\kappa_1})^{k} ( \frac{ 1 + \frac{c_1}{2} }{ 1 + c_2 })^{k}\\
+            &\le& \theta( \log n ) \frac{1}{(1-\epsilon)} (\frac{4 \kappa_2}{\kappa_1})^{r} ( \frac{ 1 + \frac{c_1}{2} }{ 1 + c_2 })^{r}\\
             &\le& \theta( \log n ).
 \end{eqnarray*}
 Thus, it takes at most $O(\log n)$ decisions to leave phae $j$. By construction, there are at most $\log n$

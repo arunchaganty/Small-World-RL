@@ -1,19 +1,22 @@
 \begin{abstract}
 
-Understanding how we are able to perform a diverse set of complex
-tasks has been a central question for the Artificial Intelligence
-community. Drawing parallels from the small-world phenomenon in social
-networks, we hypothesise that the key to this ability lies in finding
-a set of composable subtasks that ``easily'' span the set of all
-tasks. We model our hypothesis using the options framework from
-reinforcement learning, and prove that given well-distributed
-subtasks, an agent can perform any task using only a logarithmic
-combination of subtasks and primitive actions. We also present an
-algorithm for an agent to learn these subtasks through a modest number
-of explorations without knowledge of the underlying domain.
-Experimental results show that these subtasks outperform other popular
-subtask generation schemes on standard domains. \draft{What is our
-contribution?}
+Understanding how we are able to perform a diverse set of complex tasks
+has been a central question for the Artificial Intelligence community.
+One popular approach is to use temporal abstraction as a framework to
+capture the notion of subtasks. However, this transfers the problem to
+finding the right subtasks, which is still an open problem. Existing
+approaches for subtask generation require too much knowledge of the
+environment, and the abstractions they create can overwhelm the agent.
+We propose a simple algorithm inspired by small world networks to learn
+subtasks while solving a task that requires virtually no information of
+the environment. Additionally, we show that the subtasks we learn can be
+easily composed by the agent to solve any other task; more formally, we
+prove that any task can be solved using only a logarithmic combination
+of these subtasks and primitive actions. Experimental results show that
+the subtasks we generate outperform other popular subtask generation
+schemes on standard domains. 
+
+%\draft{What is our contribution?}
 % Relevance to lifelong learning?
 
 \end{abstract}
