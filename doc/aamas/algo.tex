@@ -1,3 +1,57 @@
 \section{Constructing Options from Experience} 
 \label{sec:algo}
 
+We saw in the previous section that we needed to generate $O(n)$ number
+of path options. The utility of this method would severly be in question
+if there was no efficient way to generate these options.
+
+We make the observation that while we need $O(|S|)$ options, the
+objective of the options is to bring the agent exponentially closer to
+the maximal value state. Thus, we should be able to get away with
+cheaply learnt options.
+
+\begin{figure*}[ttt!]
+  \begin{minipage}[t]{.49\textwidth}
+    \begin{algorithm}[H]
+      \caption{Small World Options from Experience}
+      \label{algo:small-world-experience}
+      \begin{algorithmic}[1]
+          \REQUIRE $\mdp$, $\Rewards$, $r$, $n$, epochs, tasks
+          \STATE $O \gets \emptyset$
+          \FOR{ $i= 0 \to \textrm{tasks}$ }
+            \STATE $\rewards \sim \Rewards$
+            \STATE $Q \gets $ Solve $\mdp$ with $\rewards$ using
+                $\frac{\textrm{epochs}}{\textrm{tasks}}$ epochs
+            \STATE $O' \gets $ QOptions( $Q$, $r$,
+                $\frac{n}{\textrm{tasks}}$ )
+            \STATE $O \gets O \cup O'$
+          \ENDFOR
+          \RETURN A random subset of $n$ options from $O$
+      \end{algorithmic}
+    \end{algorithm}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[t]{.49\textwidth}
+    \begin{algorithm}[H]
+      \caption{{\bf QOptions}: Options from a $Q$-Value Function}
+      \label{algo:qoptions}
+      \begin{algorithmic}[1]
+          \REQUIRE $Q$, $r$, $n$
+          \STATE $O \gets \emptyset$
+          \STATE $\pi \gets $ greedy policy from $Q$
+          \FORALL{ $s$ in $\states$ }
+            \STATE Choose an $s'$ according to $P_r$
+            \IF{ $Q(s', \pi(s')) > Q(s, \pi(s))$ }
+              \STATE $O \gets O \cup \tuple{\{s\}, \pi, \{s'\} \cup \{t \mid Q(s',\pi(s')) < Q(t, \pi(t))\} }$
+            \ENDIF
+          \ENDFOR{ $s$ in $\states$ }
+          \RETURN A random subset of $n$ options from $O$
+      \end{algorithmic}
+    \end{algorithm}
+
+  \end{minipage}
+  \hfill
+\end{figure*} 
+
+
+
