@@ -1,0 +1,188 @@
+
+
+Automatic Discovery of Subgoals in Reinforcement Learning
+using Diverse Density
+
+Informally, a bottleneck is a region in the agent’s observation space
+that the agent tends to visit frequently on successful paths to a goal
+but not on unsuccessful paths (for some suitable definition of success).
+
+If the agent
+can discover these bottleneck regions and learn policies to
+reach them during the initial stages of learning, it can use
+these policies for more effective exploration as well as to
+more quickly refine its overall policy.
+
+
+??An option is like a traditional macro ex-
+cept that instead of generating a fixed sequence of actions,
+it follows a closed-loop policy so that it can react to the environment. 
+
+One motivation for using bottlenecks as subgoals is the
+effect of the subgoal options on the agent’s exploration.
+
+If the agent uses some form of randomness to select ex-
+ploratory primitive actions, it is likely to remain within the
+more strongly connected regions of the state space. An op-
+tion for achieving a bottleneck region, on the other hand,
+will tend to connect separate strongly connected areas. 
+
+The idea of using bottlenecks as subgoals is not confined to
+gridworlds or navigation tasks. We expect that other tasks
+with similar dynamics would also benefit from subgoal dis-
+covery as described in this paper. For example, consider a
+game in which the agent must find a key to open a door be-
+fore it can proceed. If it can discover that having a key is
+a useful subgoal, then it will more quickly be able to learn
+how to advance from level to level. Clearly this approach
+will not work for every task since bottlenecks or subgoals
+of achievement do not always make sense for particular en-
+vironments.
+
+Mannor : 
+McGovern and Barto (2001) added the suc-
+cess condition to the frequency measure—states serve
+as potential subgoals if they are frequently visited on
+successful paths but are not visited on unsuccessful
+ones. A problem with frequency based solutions is
+that the agent may need excessive exploration of the
+environment in order to distinguish between “impor-
+tant” and “regular” states, so that options are defined
+at relatively advanced stages of the learning process.
+Our approach deviates from these approaches by considering
+clusters of states as intermediate stages in the learn-
+ing process, rather than unique states, which leads to a
+more robust and versatile learning procedure. We de-
+fine each option as a sub-policy that allows the agent to
+efficiently shift from one cluster of states to the other.
+
+    => he wants options that lets him explore the state 
+       space more efficiently, once you reach one cluster 
+       you can easily reach states withing the same cluster 
+       whereas it is difficult to reach states of different  
+       cluster.( one of the reason why small-world options 
+       are better then betweenness.)
+       An additional
+       advantage of the clustering approach is that explo-
+       ration may become more efficient since the agent can
+       quickly wander to states that would be otherwise less
+       explored, since they may be harder to reach from the
+       initial states.
+
+       The algorithm that will be presented here is based on considering bottlenecks
+       as the “border states” of strongly connected areas.
+       If an agent knows how to reach
+       the bottleneck states, and uses this ability, its search in the state space will be
+       more efficient.
+       If we view an
+       MDP as a flow problem, where nodes are states and arcs are state transitions,
+       bottlenecks represent “accumulation” nodes, where many paths coincide.
+
+       A car parking
+       problem, a robot learning to stand up (see [13]), and some scheduling problems,
+       are characterized by the existence of bottlenecks that must be reached in order
+       to complete the overall task.
+
+McGovern and Barto
+A problem with frequency based solutions is
+that the agent may need excessive exploration of the
+environment in order to distinguish between “impor-
+tant” and “regular” states, so that options are defined
+at relatively advanced stages of the learning process.
+
+One motivation for using bottlenecks as subgoals is the
+effect of the subgoal options on the agent’s exploration.
+If the agent uses some form of randomness to select ex-
+ploratory primitive actions, it is likely to remain within the
+more strongly connected regions of the state space. An op-
+tion for achieving a bottleneck region, on the other hand,
+     will tend to connect separate strongly connected areas.
+
+     We have
+     shown in previous work (McGovern, 1998b) that the effect
+     on exploration is one of two main reasons that options are
+     sometimes able to dramatically affect learning.
+
+
+Sutton and Precup, between MDP's and SMDP's
+
+What the hell does para 1 of page 14 of MDP and SMDP(Sutton) say?
+why does options help you learn faster
+
+
+Representing knowledge flexibly at multiple levels of temporal abstraction has the
+potential to greatly speed planning and learning on large problems.
+
+
+
+
+     
+
+??subgoals. One approach is to choose states which have a non-
+typical reinforcement (a high reinforcement gradient, for example, as in [7]). This
+approach is not applicable in domains which suffer from delayed reinforcement
+(for example, a maze with ten rooms and one goal).
+
+
+
+Ozgur sexy : 
+
+A number of methods have been suggested to address this need. One approach is to search
+for commonly occurring subpolicies in solutions to a set of tasks and to define temporally-
+extended actions with corresponding policies [6, 7]. A second approach is to identify
+subgoals—states that are useful to reach—and generate temporally-extended actions that
+take the agent efficiently to these subgoals. 
+
+
+The utility of access states as subgoals has been
+argued previously in the literature [9, 10, 11, 12]. Their main appeal is that they allow more
+efficient exploration of the state space by providing easy access to neighboring regions.
+Furthermore, because access states are defined independently of the reward function, they
+are useful in solving not only the current task, but also a variety of other tasks that share the
+same state transition matrix but differ in their reward functions—getting to the doorway is
+useful regardless of what the agent needs to do in the other room.
+
+
+
+Broad problem we consider is how to equuip artificcial agents with the ability to form useful high
+level behaviors, or skills, from available primitives.
+
+Learn useful class of skills based on a graphical represen-
+tation of the agent’s interaction with its environment.
+
+She uses betweenness hypothesizing that these set of skills will help in efficient navigation 
+through the state space.
+Her claim is that states that have a pivotal role in efficiently navigating the interaction graph are
+useful subgoals to reach and that a useful measure for evaluating how pivotal a vertex v is its centrality.
+In her use of betweenness, she include path weights to take into account the reward function(in what way does 
+this help).
+
+Now we can say that is some domains, that is goal not the hallway these set of option will not help but what 
+would be better of would be to have the sert of options that can also help you navigate within the same room, 
+help navigate within the set of states irrespective of their values?? but on how far they are from each other.
+
+The skill policy was the optimal policy for reaching the subgoal. i.e the shortest path on the interaction graph.
+
+Peeyush was saying that even random option when takne in large number help in navigating the state space efficiently.
+Which is not the case with us ? Any explanation why? Are our random option defined the right way? 
+Of course they are defined the right way, I just want us to give a think over it once again. Screw Precup.
+
+One biggest advantage that our method offers is that there is minimal cost associated with determination of options 
+compared to using centrality algorithm, graph partitioning algorithm and clustering algorithm as needed in 
+other approaches. And these options can be easily generated as we encounter new states in the state space.
+
+
+
+
+NOTE: Everyone talks about skills which help in efficient navigation through the state space 
+      can we have a metric which decides how wfficiently the state space is navigated.
+
+How efficient will be our algorithm if we want to learn and form new options based on small world. 
+: shouldn't be difficult
+
+Bottlenecks have
+been described as regions that the agent tends to visit frequently on successful trajectories but not on
+unsuccessful ones [3], border states of strongly connected areas [6], and states that allow transitions
+to a different part of the environment [7]
+
+
