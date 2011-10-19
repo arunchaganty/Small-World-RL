@@ -2,6 +2,7 @@
 RL Framework
 Authors: Arun Chaganty, Prateek Gaur
 Rooms Environment
+Room, with K arbitrary rewards distributed in the space.
 """
 
 import numpy as np
@@ -26,6 +27,7 @@ class Rooms():
     REWARD_BIAS = -1
     REWARD_FAILURE = -20 - REWARD_BIAS
     REWARD_SUCCESS = 50 - REWARD_BIAS
+    REWARD_SUCCESS_VAR = 1
     REWARD_CHECKPOINT = 0 # - REWARD_BIAS
 
 
@@ -120,14 +122,12 @@ class Rooms():
         return f, g 
 
     @staticmethod
-    def make_mdp( road_map ):
+    def make_mdp( road_map, K ):
         size = road_map.shape
         min_size = len( road_map[ road_map == 0] )
         f, g = Rooms.create_bijection( road_map )
 
         state_idx = functools.partial( Rooms.state_idx, road_map, f )
-
-        goal = Rooms.get_random_goal( road_map )
 
         S = min_size
         A = 4 # up down left right
@@ -180,18 +180,24 @@ class Rooms():
                         ( state_idx( *down_state ), RESIDUE ),
                         ( state_idx( *left_state ), RESIDUE ),
                         ( state_idx( *right_state ), ACCURACY ), ]
+            
         # Add rewards to all states that transit into the goal state
-        s = state_idx( *goal )
-        for s_ in xrange( S ):
-            R[ (s_,s) ] = Rooms.REWARD_SUCCESS - Rooms.REWARD_BIAS
-        
         start_set = None
-        end_set = [ s ]
+        end_set = []
+
+        for i in xrange( K ):
+            goal = Rooms.get_random_goal( road_map )
+            g = state_idx( *goal )
+            # Get reward for moving to s
+            reward = np.random.normal( Rooms.REWARD_SUCCESS - Rooms.REWARD_BIAS, Rooms.REWARD_SUCCESS_VAR )
+            for s_ in xrange( S ):
+                R[ (s_,g) ] = reward
+            end_set.append( g )
 
         return S, A, P, R, R_bias, start_set, end_set
 
     @staticmethod
-    def create( spec ):
+    def create( spec, K=1 ):
         """Create a room from @spec"""
         if spec is None:
             raise NotImplemented
@@ -202,10 +208,10 @@ class Rooms():
             else:
                 road_map = Rooms.make_map_from_txt_file( spec )
 
-        return Environment( Rooms, *Rooms.make_mdp( road_map ) )
+        return Environment( Rooms, *Rooms.make_mdp( road_map, K ) )
 
     @staticmethod
-    def reset_rewards( env, spec ):
+    def reset_rewards( env, spec, K=1 ):
         if spec is None:
             raise NotImplemented
         else:
@@ -219,14 +225,18 @@ class Rooms():
         f, g = Rooms.create_bijection( road_map )
         state_idx = functools.partial( Rooms.state_idx, road_map, f )
 
-        # Reset the rewards
-        R = {}
         # Add rewards to all states that transit into the goal state
-        s = state_idx( *goal )
-        for s_ in xrange( env.S ):
-            R[ (s_,s) ] = Rooms.REWARD_SUCCESS - Rooms.REWARD_BIAS
-        
         start_set = None
-        end_set = [ s ]
+        end_set = []
+
+        for i in xrange( K ):
+            goal = Rooms.get_random_goal( road_map )
+            g = state_idx( *goal )
+            # Get reward for moving to s
+            reward = np.random.normal( Rooms.REWARD_SUCCESS - Rooms.REWARD_BIAS, Rooms.REWARD_SUCCESS_VAR )
+            for s_ in xrange( S ):
+                R[ (s_,g) ] = reward
+            end_set.append( g )
 
         return Environment( Rooms, env.S, env.A, env.P, R, env.R_bias, start_set, end_set )
+

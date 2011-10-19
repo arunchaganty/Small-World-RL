@@ -13,7 +13,7 @@ from Rooms import Rooms
 class RoomsOptions( ):
 
     @staticmethod
-    def create( spec, scheme = 'none', count = 20, *args ):
+    def create( spec, K=1 scheme = 'none', count = 20, *args ):
         """
         @spec - Specification (size, endpoints, barriers); either exactly
                 specified in a file, or with numeric values in a list
@@ -22,7 +22,7 @@ class RoomsOptions( ):
         comment : optimal(shortest path to destination)??|random|ozgur's betweenness|ozgur's randomness
         """
 
-        env = Rooms.create( spec )
+        env = Rooms.create( spec, K )
 
         # Percentage
         if isinstance(count,str):
@@ -53,8 +53,8 @@ class RoomsOptions( ):
         return OptionEnvironment( RoomsOptions, env.S, env.A, env.P, env.R, env.R_bias, env.start_set, env.end_set, O )
 
     @staticmethod
-    def reset_rewards( env, spec, *args ):
+    def reset_rewards( env, spec, K=1, *args ):
         O = env.O
-        env = Rooms.reset_rewards( env, spec )
+        env = Rooms.reset_rewards( env, spec, K )
         return OptionEnvironment( RoomsOptions, env.S, env.A, env.P, env.R, env.R_bias, env.start_set, env.end_set, O )
 
