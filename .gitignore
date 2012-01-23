@@ -27,5 +27,8 @@ output/
 output-*/
 data-*/
 
+# Included library
+src/networkx
+
 # Temporary stuff
 attic/
