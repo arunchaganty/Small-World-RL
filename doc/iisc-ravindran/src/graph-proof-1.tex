@@ -1,0 +1,21 @@
+\documentclass{article}
+\usepackage{tikz}
+\usetikzlibrary{external}
+\usetikzlibrary{arrows}
+%\tikzexternalize % activate!
+
+\begin{document}
+\begin{tikzpicture}[]
+    % Grid
+    \draw[clip] (-1,-1) rectangle (11,11);
+    \draw[step=1,color=lightgray] (0,0) grid (10,10);
+    \foreach \xpos in {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+    {
+      \foreach \ypos in {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+      {
+      \draw [color=lightgray,fill=lightgray,opacity=1.0] (\xpos,\ypos) circle (0.1);
+      };
+    };
+
+\end{tikzpicture}
+\end{document}
