@@ -13,11 +13,11 @@ from Environment import *
 import Runner
 from ProgressBar import ProgressBar
 
-def main( iterations, ensembles, epochs, agent_type, agent_args, env_type, env_args, file_prefix ):
+def main( iterations, ensembles, episodes, agent_type, agent_args, env_type, env_args, file_prefix ):
     """RL Testbed.
     @arg iterations: Number of environments to average over
     @arg ensembles: Number of bots to average over
-    @arg epochs: Number of episodes to run for
+    @arg episodes: Number of episodes to run for
     @arg agent_type: String name of agent
     @arg agent_args: Arguments to the agent constructor
     @arg env_type: String name of environment
@@ -30,19 +30,19 @@ def main( iterations, ensembles, epochs, agent_type, agent_args, env_type, env_a
     oldprog = str(progress)
 
     # Counters
-    ret = np.zeros( epochs, dtype=float )
-    min_, max_ = np.inf * np.ones( epochs, dtype=float) , -np.inf * np.ones( epochs, dtype=float)
-    var = np.zeros( epochs, dtype=float )
+    ret = np.zeros( episodes, dtype=float )
+    min_, max_ = np.inf * np.ones( episodes, dtype=float) , -np.inf * np.ones( episodes, dtype=float)
+    var = np.zeros( episodes, dtype=float )
 
     env = env_type.create( *env_args )
     for i in xrange( 1, iterations+1 ):
         env = env.domain.reset_rewards( env, *env_args )
 
-        ret_ = np.zeros( epochs, dtype=float )
+        ret_ = np.zeros( episodes, dtype=float )
         # Initialise environment and agent
         for j in xrange( 1, ensembles+1 ):
             agent = agent_type( env.Q, *agent_args )
-            ret__ = Runner.run( env, agent, epochs )
+            ret__ = Runner.run( env, agent, episodes )
             ret__ = np.cumsum( ret__ )
             # Add to ret_
             ret_ += (ret__ - ret_) / j
@@ -72,7 +72,7 @@ def main( iterations, ensembles, epochs, agent_type, agent_args, env_type, env_a
 
 def print_help(args):
     """Print help"""
-    print "Usage: %s <episodes> <epochs> <agent:args> <environment:args>" % (args[0])
+    print "Usage: %s <episodes> <episodes> <agent:args> <environment:args>" % (args[0])
 
 def convert(arg):
     """Convert string arguments to numbers if possible"""
@@ -99,7 +99,7 @@ if __name__ == "__main__":
         else:
             iterations = convert( sys.argv[1] )
             ensembles = convert( sys.argv[2] )
-            epochs = convert( sys.argv[3] )
+            episodes = convert( sys.argv[3] )
 
             agent_str = sys.argv[4].split(":")
             agent_args = map( convert, agent_str[1:] )
@@ -111,7 +111,7 @@ if __name__ == "__main__":
 
             file_prefix = sys.argv[ 6 ]
 
-            main( iterations, ensembles, epochs, agent_type, agent_args, env_type, env_args, file_prefix )
+            main( iterations, ensembles, episodes, agent_type, agent_args, env_type, env_args, file_prefix )
 
     main_wrapper()
 

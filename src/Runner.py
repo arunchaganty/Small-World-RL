@@ -24,18 +24,16 @@ def load_agent( agent_type ):
     agentClass = getattr( mod, agent_type )
     return agentClass
 
-def run(env, agent, epochs):
-    """ Simulate some epochs of running """
+def run(env, agent, episodes):
+    """ Simulate some episodes of running """
 
-    state = env.start()
-    reward = 0
-    episode_ended = True
-    ret = []
+    state, reward, episode_ended = env.start(), 0, True
 
-    epoch = 0
-    episode_epochs = 0
-    started = False # Only collect after a while
-    while epoch < epochs:
+    episodic_return, episodic_epochs = [], []
+    ret, epochs = 0, 0
+
+    episode = 0
+    while episode < episodes:
         action = agent.act(state, reward, episode_ended)
         state, reward, episode_ended = env.react(action)
 
@@ -43,20 +41,18 @@ def run(env, agent, epochs):
         if isinstance( action, Option ):
             # If this was an option, then multiple rewards would have been
             # returned.
-            ret += reward
-            epoch += len( state ) - 1
-            episode_epochs += len( state ) - 1
+            ret += sum( reward )
+            epochs += len( state ) - 1
         else:
-            ret.append( reward )
-            epoch += 1
-            episode_epochs += 1
+            ret += reward
+            epochs += 1
 
-        if not started and epoch > int( epochs * 0.9 ):
-            started = True
-            episode_epochs = 0
+        if episode_ended:
+            episodic_return.append( ret )
+            episodic_epochs.append( epochs )
+            epochs = 0
 
-        if started and episode_ended:
-            episode_epochs = 0
+
 
     # Chop off any extras
     return ret[ : epochs ]

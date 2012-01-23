@@ -191,7 +191,7 @@ def learn_option_from_policy( pi, Q, s, s_ ):
     """Extract an option from s to s_ from pi"""
     # The sub-policy such that Q(t,pi(t)) < Q(s_,pi(s_))
     pi = dict( [ (t,a[0]) for (t,a) in pi.items()] )
-    pi_ = dict( [ (t,(a,pr)) for (t,(a,pr)) in pi.items() if Q[t][a] < Q[s_][pi[s_][0]] ] )
+    pi_ = dict( [ (t,((a,pr),)) for (t,(a,pr)) in pi.items() if Q[t][a] < Q[s_][pi[s_][0]] ] )
     I = set([s])
     B = { s_ : 1.0 }
 
