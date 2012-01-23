@@ -1,0 +1,479 @@
+AAMAS 2012 Program Chairs
+------------ Review -------------
+Relevance                                     : 9
+Originality and novelty                       : 8
+Significance                                  : 7
+Readability and organization                  : 6
+Technical quality and soundness               : 7
+Overall recommendation (Full Paper)           : 8
+Overall recommendation (Short Paper)          : 10
+Reviewer Confidence                           : 8
+
+-- Comments to the author(s):
+Meta-review
+
+----------
+
+
+
+There was consensus among the PC members that this is a very good
+
+paper and a clear accept. The authors draw an interesting connection
+
+between options in an RL state space and small-world graphs,
+
+and develop a clever algorithm for efficiently exploiting this
+
+connection.
+
+
+
+There was a sense that the authors could work on the presentation, in
+
+particular focusing more on the development of their contribution
+
+relative to the space spent on RL in general. It may also be useful to
+
+provide some more discussion on potential characterization of the
+
+types of domains / problems where this algorithm may be helpful (for
+
+example, the results presented seem to imply that it may be
+
+particularly valuable in navigation domains with a goal state).
+
+
+-- Summary:
+SUMMARY OF REVIEW:
+---------- End of Review ----------
+------------ Review -------------
+Relevance                                     : 10
+Originality and novelty                       : 9
+Significance                                  : 8
+Readability and organization                  : 8
+Technical quality and soundness               : 6
+Overall recommendation (Full Paper)           : 8
+Overall recommendation (Short Paper)          : 8
+Reviewer Confidence                           : 9
+
+-- Comments to the author(s):
+Summary
+
+
+
+This paper presents a method for generating MDP options based on
+
+randomly generated small world networks. Specifically, for each state
+
+one option is generated to take the agent to another randomly selected
+
+far away state (with probabilities related to the distance between the
+
+start and end states). An option generation algorithm based on this
+
+principle is devised and compared (favorably) to other methods for
+
+generating options on three domains.
+
+
+
+Relevance
+
+
+
+This paper is highly relevant to AAMAS. Temporal abstraction is key to
+
+creating agents that can solve complex problems with long temporal
+
+horizons. This paper addresses the problem of creating agents that can
+
+generate their own temporal abstractions, which is a key component of
+
+autonomy.
+
+
+
+Originality
+
+
+
+This paper takes an interesting new approach to option
+
+generation. While random option generation has been explored, and
+
+options based on graph-theoretic properties of the state space have
+
+been proposed, this paper presents an interesting melding of the
+
+advantages of both: the options can be generated without complete
+
+knowledge of the topology of the state space but are also selected in
+
+a principled way and can therefore benefit from some graph-theoretical
+
+guarantees.
+
+
+
+Significance
+
+
+
+I think the most significant aspect of the proposed method is its
+
+focus on minimizing the impact of the generated options on the agents'
+
+decision space and making them learnable without a complete MDP
+
+model. Both of these are clearly important to the scalability of the
+
+options framework, and both have been missing from existing methods
+
+for generating options.
+
+
+
+I also quite like the paper's demonstration that one can get good
+
+results by not worrying so much about getting the "right" options and
+
+instead just trying to generate some options that satisfy some basic
+
+criteria. I can certainly imagine lines of work that would build upon
+
+these results.
+
+
+
+Technical Quality
+
+
+
+I appreciated the quality of the evaluations in this paper, both
+
+theoretical and empirical. For the most part, I believe the paper to
+
+be technically sound. However, I did run across a few small technical
+
+snags that would bear clarification by the authors (luckily they have
+
+plenty of extra room left for clarifying exposition).
+
+
+
+My biggest concern is that, unless I am mistaken, the logarithmic
+
+bound presented here only genuinely applies to lattice graphs. Most
+
+interesting state spaces are not lattices (otherwise the idea of
+
+"bottleneck" states would not have come about!) The experiments
+
+demonstrate the method on 3 domains that violate the lattice
+
+assumption to differing degrees, which is quite nice. However, the
+
+authors frequently refer to the theoretical bound without explicitly
+
+qualifying the loss of generality. For instance in the Conclusions,
+
+"Finally, they are interesting from a theoretical perspective, as they
+
+require only a logarithmic number of decisions required in a learning
+
+task." The theoretical result is indeed interesting, but it is
+
+important not to oversell it. The theorem has real limitations and
+
+cannot be applied universally to any MDP. I think the limits of its
+
+reach should be made more explicit. If the theorem has more power than
+
+I give it credit for, then that should be argued more clearly.
+
+
+
+A smaller issue is that distance between two vertices is never quite
+
+defined. In a small world network, I'm pretty sure it is simply meant
+
+to be the smallest number of steps it takes to get from one to the
+
+other. In an MDP where transitions are stochastic, that may not be the
+
+best measure. Expected length makes more sense, and that seems to be
+
+what is used in Lemma 1 and 2. But then the authors' description of
+
+the graph of the MDP incudes the transition probabilities as
+
+weights. This made me think maybe the distance was the *weighted*
+
+distance (the smallest sum of weights possible along a simple path
+
+from one vertex to another). However, that doesn't make sense either
+
+since 1) there might be vertices only one step away but still very
+
+*far* away, in which case an option can't possible help and 2) summing
+
+the transition probabilities makes no sense. So now I don't know what
+
+role the weights play in this formulation. I think the paper would be
+
+improved in general if the theoretical development were a little less
+
+terse. Luckily there is plenty of room to devote to some more prose to
+
+help the reader keep things clear.
+
+
+
+Presentation
+
+
+
+Overall, this paper is very well-written and well-organized. Some of
+
+the theoretical development could be more clear (as mentioned above).
+
+
+
+I also ran across a few small type-os and other issues:
+
+
+
+- In the Appendix, should those thetas be capital?
+
+
+
+- At the end of the Appendix 'phae' should be 'phase'
+
+
+
+- In Section 5 all of the references to Figures are incorrect (they
+
+ all refer to the section number instead of the figure number)
+
+
+
+- The Betweeness + SW method in Figure 4 is never described
+
+
+-- Summary:
+This is a very nice paper that combines theoretical insight with a convincing empirical demonstration. There are ways the paper's clarity and readability could  be improved, mainly by being more explicit about what the precise implications of the results are, and giving the mathematics some additional clarifying exposition.
+---------- End of Review ----------
+------------ Review -------------
+Relevance                                     : 6
+Originality and novelty                       : 7
+Significance                                  : 5
+Readability and organization                  : 8
+Technical quality and soundness               : 5
+Overall recommendation (Full Paper)           : 6
+Overall recommendation (Short Paper)          : 6
+Reviewer Confidence                           : 8
+
+-- Comments to the author(s):
+REVIEW CRITERIA
+
+
+
+SUMMARY:
+
+The article proposes a new scheme for generating subtasks. Instead of focusing on "bottlenecks" and marking nodes that are often visited by the agent during the reinforcement learning process, an augmentation of a graph is performed by adding additional option to each of the nodes to a non-neighboring node with probability inversely proportional to the distance between the nodes.
+
+
+
+RELEVANCE:
+
+- Is the work relevant to AAMAS 2012? For example, does the paper describe:
+
+* an implemented agent system for which the need to use agents is clearly
+
+ motivated
+
+No.
+
+
+
+* theoretical or applied work relevant to autonomous agents or multiagent
+
+ systems
+
+The article concerns a subtask discovery in reinforcement learning, and therefore indirectly relates to multi-agent systems.
+
+
+
+* methodologies or languages that can be used to construct agent systems
+
+No.
+
+
+
+ORIGINALITY:
+
+- Does the paper clearly point out differences from related research?
+
+To certain degree.
+
+
+
+- Are the problems or approaches new? For example, does the paper:
+
+* address a new problem or one that has not been studied in much depth?
+
+No.
+
+
+
+* introduce an interesting research paradigm?
+
+No.
+
+
+
+* describe an innovative combination of techniques from different disciplines?
+
+Yes - the article combines some graph-theoretic properties of small world network to show that their proposed scheme of subtask generation produces more optimal learning process.
+
+
+
+* introduce an area that appears promising, or might stimulate others to
+
+ develop promising alternatives?
+
+No.
+
+
+
+
+
+SIGNIFICANCE
+
+- Is the work important? I.e. does the paper make a valuable contribution
+
+ to knowledge and understanding in the area?
+
+Somewhat. The evaluation is
+
+
+
+- Does it advance the state of the art?
+
+To certain degree.
+
+
+
+- Does the paper add to our understanding of some aspect of agent systems?
+
+No.
+
+
+
+- Does the paper stimulate discussion of important issues or alternative
+
+ points of view?
+
+No.
+
+
+
+- Does the paper carefully evaluate the strengths and limitations of its
+
+ contributions, and draw lessons for future work?
+
+Not to the degree necessary for full scientific evaluation.
+
+
+
+TECHNICAL QUALITY
+
+- Is there a careful evaluation of the proposed method and the results?
+
+See above. There is evaluation based on one spatial reinforcement learning problem, but it is not indicative on any generalizable properties of the new scheme.
+
+
+
+- Is the paper technically sound, with compelling arguments? For example:
+
+* If a new method or algorithm is proposed, is there a careful evaluation,
+
+ and analysis of the results of that evaluation?
+
+
+
+* If the paper describes an application, does it describe general lessons
+
+ learned, or ways in which agent technology is valuable for a particular domain?
+
+* If the paper is theoretical, does it provide new insight, or prove properties
+
+ of interest?
+
+To certain degree. The authors provide a complexity bound proof which follows from a different work published earlier.
+
+
+
+* If the paper describes a language or methodology, does it clearly extend
+
+ and improve on current practice?
+
+No.
+
+
+
+QUALITY OF PRESENTATION
+
+- Is the paper clearly written?
+
+Yes.
+
+
+
+- Does the paper motivate the research?
+
+Yes.
+
+
+
+- Are results clearly described and evaluated?
+
+To certain degree. The evaluation is not sufficient for generalizations.
+
+
+
+- Is the paper well organized?
+
+To certain degree. The organisation would benefit from shortening a general description of reinforcement learning, and expanding the evaluation of the proposed scheme.
+
+
+-- Summary:
+SUMMARY OF REVIEW:
+
+
+
+The article would benefit from motivating more and providing some informal intuitions that would provide a better "feel" for the reader about the proposed scheme. E.g. the bottlenecks-based options are intuitively simpler to understand (even though they have their complexity issues), whereas the small-world options scheme is a little more difficult to fully appreciate or get intuitions about.
+
+
+
+The evaluation part is somewhat weak, and should be expanded. Theoretical analysis or more comprehensive examples and comparison are advised.
+---------- End of Review ----------
+------------ Review -------------
+Relevance                                     : 7
+Originality and novelty                       : 7
+Significance                                  : 6
+Readability and organization                  : 8
+Technical quality and soundness               : 8
+Overall recommendation (Full Paper)           : 7
+Overall recommendation (Short Paper)          : 7
+Reviewer Confidence                           : 6
+
+-- Comments to the author(s):
+The paper addresses the problem of learning abstractions, called "options", in order to facilitate learning from a RL prospective. Learning abstractions is an important problem in artificial intelligence and it is certainly relevant to the audience of AAMAS. The authors presents novel algorithms that are able to learn options from experience, theoretical analysis, and experimental results. My main criticism is that the experimental results are performed on small domains; however this seems to be the norm in many reinforcement learning papers.
+-- Summary:
+SUMMARY OF REVIEW:
+---------- End of Review ----------
+
+////////////////////////////////////////////////////
+Powered by ConfMaster.net
+///////////////////////////////////////////////////
