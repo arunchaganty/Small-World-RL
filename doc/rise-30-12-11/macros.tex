@@ -1,0 +1,35 @@
+% Section References
+\newcommand{\secref}[1] {\hyperref[#1]{Section~\ref*{#1}}}
+\newcommand{\thmref}[1] {\hyperref[#1]{Theorem~\eqref*{#1}}}
+\newcommand{\lmref}[1] {\hyperref[#1]{Lemma~\eqref*{#1}}}
+\newcommand{\algoref}[1] {\hyperref[#1]{Algorithm~\ref*{#1}}}
+\newcommand{\eqnref}[1] {Equation \eqref{#1}}
+\renewcommand{\algorithmiccomment}[1]{\textit{// #1}}
+%\theoremstyle{plain} \newtheorem{thm}{Theorem}
+
+%Math Operators
+\DeclareMathOperator {\argmax} {argmax}
+%\DeclareMathOperator {\Pr} {Pr}
+\DeclareMathOperator {\sgn} {sgn}
+\DeclareMathOperator {\trace} {tr}
+\DeclareMathOperator {\connected} {connected}
+\DeclareMathOperator {\dist} {d_l}
+
+\newcommand{\ud}{\, \mathrm{d}}
+\newcommand{\diff}[1] {\frac{\partial}{\, \partial #1}}
+\newcommand{\diffn}[2] {\frac{\partial^{#2}}{\, \partial {#1}^{#2}}}
+\newcommand{\tuple}[1] {\langle #1 \rangle}
+
+%Short hand
+\newcommand{\mdp} {\ensuremath{\mathcal{M}}}
+\newcommand{\states} {S}
+\newcommand{\actions} {A}
+\newcommand{\transitions} {P}
+\newcommand{\rewards} {R}
+\newcommand{\Rewards} {\mathcal{R}}
+\newcommand{\graph} {\mathcal{G}}
+\newcommand{\policy} {\pi}
+\newcommand{\initset} {\mathcal{I}}
+\newcommand{\stopcond} {\beta}
+\newcommand{\option} {\tuple{ \initset,\policy,\stopcond} }
+\newcommand{\options} {\mathcal{O}}
